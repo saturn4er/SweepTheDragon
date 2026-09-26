@@ -15,6 +15,8 @@ var _restarting := false
 ## Debug x-ray: draws every tile as revealed without touching the game state.
 var xray := false
 var _xray_label: Label
+const UNDO_DEPTH := 300
+var _history: Array[Dictionary] = []
 
 
 func _ready() -> void:
@@ -65,6 +67,7 @@ func new_game(seed_value := 0) -> void:
 	if _restarting:
 		return
 	_restarting = true
+	_history.clear()
 	game = Game.new(seed_value)
 	book.close_book()
 	win.visible = false
@@ -100,6 +103,7 @@ func _restart() -> void:
 func _on_tile_pressed(p: Vector2i) -> void:
 	if book.visible or not game.is_playing():
 		return
+	_remember()
 	var ev := game.press(p)
 	_apply(ev)
 	render()
@@ -123,12 +127,33 @@ func _on_hero_pressed() -> void:
 	if game.status == Game.Status.DEAD:
 		_restart()
 		return
+	if game.can_level_up():
+		_remember()
 	var ev := game.hero_pressed()
 	_apply(ev)
 	render()
 	if ev.is_empty() and game.is_playing():
 		hud.play_tapped()
 		Audio.play("jorge")
+
+
+func _remember() -> void:
+	_history.append(game.snapshot())
+	if _history.size() > UNDO_DEPTH:
+		_history.pop_front()
+
+
+## Debug only: rewinds the last board press or level up, even out of a death or a win.
+func _undo() -> void:
+	if _history.is_empty():
+		Audio.play("wrong")
+		return
+	game.restore(_history.pop_back())
+	win.visible = false
+	board_view.menu.visible = false
+	board_view.input_enabled = not book.visible
+	Audio.play("remove_mark")
+	render()
 
 
 func _toggle_book() -> void:
@@ -152,6 +177,9 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event.is_action_pressed("cheat_reveal"):
 		xray = not xray
 		render()
+		get_viewport().set_input_as_handled()
+	elif event.is_action_pressed("undo") and xray:
+		_undo()
 		get_viewport().set_input_as_handled()
 	elif event.is_action_pressed("fullscreen"):
 		var fs := DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_FULLSCREEN

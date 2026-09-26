@@ -404,3 +404,46 @@ func test_clear_forecast_sums_board_and_refills() -> void:
 	assert_eq(f.meds_left, 2)
 	# xp on board 3 + 1 + 9 = 13 -> level 2 (4) and level 3 (5): +5 and +6, then 2 medikits at 6
 	assert_eq(f.budget, 5 + 5 + 6 + 2 * 6)
+
+
+func test_snapshot_restore_rewinds_a_turn_exactly() -> void:
+	Fixture.place(g, 1, 1, Kind.SKELETON)
+	Fixture.place(g, 2, 2, Kind.SPELL_ORB, true)
+	Fixture.place(g, 5, 5, Kind.MINE)
+	g.set_mark(Vector2i(3, 3), 7)
+	var before := g.snapshot()
+	g.press(Vector2i(1, 1))
+	g.press(Vector2i(2, 2))
+	assert_eq(g.player.hp, 3)
+	assert_true(g.board.at(1, 1).defeated)
+	g.restore(before)
+	assert_eq(g.player.hp, 6)
+	assert_false(g.board.at(1, 1).revealed)
+	assert_false(g.board.at(1, 1).defeated)
+	assert_eq(g.board.at(2, 2).kind, Kind.SPELL_ORB)
+	assert_eq(g.board.at(3, 3).mark, 7)
+	assert_eq(g.status, Game.Status.PLAYING)
+	var a := g.snapshot()
+	g.press(Vector2i(2, 2))
+	var revealed_a: Array[Vector2i] = []
+	for t in g.board.tiles:
+		if t.revealed:
+			revealed_a.append(t.pos)
+	g.restore(a)
+	g.press(Vector2i(2, 2))
+	var revealed_b: Array[Vector2i] = []
+	for t in g.board.tiles:
+		if t.revealed:
+			revealed_b.append(t.pos)
+	assert_eq(revealed_a, revealed_b, "random stream is part of the snapshot")
+
+
+func test_restore_revives_from_death() -> void:
+	Fixture.place(g, 1, 1, Kind.MINE)
+	var before := g.snapshot()
+	g.press(Vector2i(1, 1))
+	assert_eq(g.status, Game.Status.DEAD)
+	g.restore(before)
+	assert_eq(g.status, Game.Status.PLAYING)
+	assert_eq(g.player.hp, 6)
+	assert_null(g.last_pressed)

@@ -54,6 +54,8 @@ func _run() -> void:
 			"xray":
 				main.xray = not main.xray
 				main.render()
+			"undo":
+				main._undo()
 			"mark":
 				main._on_mark_requested(Vector2i(4, 4))
 			"win":

@@ -9,6 +9,14 @@ func _init(seed_value: int) -> void:
 	_r.seed = seed_value
 
 
+func get_state() -> int:
+	return _r.state
+
+
+func set_state(state: int) -> void:
+	_r.state = state
+
+
 func randi_range(from: int, to: int) -> int:
 	return _r.randi_range(from, to)
 

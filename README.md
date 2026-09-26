@@ -67,7 +67,9 @@ $GODOT --headless --path . --export-release iOS export/ios/Dragonsweeper.xcodepr
 
 ## Debug keys
 
-- `X` or `F9` toggles x-ray: every tile is drawn revealed (mimics unmasked) without changing the game.
+- `X` or `F9` toggles x-ray: every tile is drawn revealed (mimics unmasked) without changing the game,
+  with a stats line: damage left, hp budget, medikits, wasted hp.
+- `Z` or `F8` while x-ray is on undoes the last press or level up, even after dying or winning.
 - `R` restarts, `F11` toggles fullscreen, `Escape` closes the book.
 
 ## Regenerating the UI art

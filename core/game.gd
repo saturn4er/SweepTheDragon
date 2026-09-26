@@ -179,6 +179,48 @@ func book_level(kind: int) -> int:
 	return Catalog.level(kind)
 
 
+## Full copy of the run, enough to rewind a turn exactly, including the random stream.
+func snapshot() -> Dictionary:
+	var tiles: Array[Tile] = []
+	for t in board.tiles:
+		var c := Tile.new(t.pos)
+		c.copy_from(t)
+		c.fixed = t.fixed
+		tiles.append(c)
+	return {
+		"tiles": tiles,
+		"hp": player.hp, "max_hp": player.max_hp, "xp": player.xp,
+		"level": player.level, "score": player.score,
+		"status": status, "mines_disarmed": mines_disarmed, "dragon_defeated": dragon_defeated,
+		"killed_rats": killed_rats, "wasted_hp": wasted_hp, "end_msec": end_msec,
+		"last_pressed": last_pressed.pos if last_pressed != null else Vector2i(-1, -1),
+		"stamps": stamps_this_run.duplicate(),
+		"rng_state": rng.get_state(),
+	}
+
+
+func restore(snap: Dictionary) -> void:
+	var tiles: Array = snap.tiles
+	for i in board.tiles.size():
+		board.tiles[i].copy_from(tiles[i])
+		board.tiles[i].fixed = tiles[i].fixed
+	player.hp = snap.hp
+	player.max_hp = snap.max_hp
+	player.xp = snap.xp
+	player.level = snap.level
+	player.score = snap.score
+	status = snap.status
+	mines_disarmed = snap.mines_disarmed
+	dragon_defeated = snap.dragon_defeated
+	killed_rats = snap.killed_rats
+	wasted_hp = snap.wasted_hp
+	end_msec = snap.end_msec
+	var lp: Vector2i = snap.last_pressed
+	last_pressed = board.at_pos(lp) if lp.x >= 0 else null
+	stamps_this_run.assign(snap.stamps)
+	rng.set_state(snap.rng_state)
+
+
 ## What a full clear still needs versus what the run can still afford. Damage left counts every
 ## undefeated monster (armed mines excluded, they kill outright) and every remaining wall hit.
 ## Budget is the usable hp now plus every refill still reachable: level ups paid by the xp left
