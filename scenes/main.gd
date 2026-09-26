@@ -38,7 +38,8 @@ func _ready() -> void:
 	add_child(win)
 
 	_xray_label = UiKit.label("x-ray", 12, UiKit.COL_RED, 2)
-	UiKit.place(_xray_label, Vector2(30, 8), 60, 12)
+	_xray_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	UiKit.place(_xray_label, Vector2(196, 7), 388, 12)
 	_xray_label.visible = false
 	add_child(_xray_label)
 
@@ -83,6 +84,9 @@ func new_game(seed_value := 0) -> void:
 func render() -> void:
 	board_view.render(game, xray)
 	_xray_label.visible = xray
+	if xray:
+		var f := game.clear_forecast()
+		_xray_label.text = "x-ray   damage left %d   hp budget %d   medikits %d   wasted hp %d" % [f.damage_left, f.budget, f.meds_left, f.wasted]
 	hud.render(game)
 	if book.visible:
 		book.refresh()

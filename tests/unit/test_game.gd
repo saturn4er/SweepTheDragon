@@ -378,3 +378,29 @@ func test_full_generated_game_can_be_played_deterministically() -> void:
 	b.press(b.board.first_of(Kind.ORB).pos)
 	for i in a.board.tiles.size():
 		assert_eq(a.board.tiles[i].revealed, b.board.tiles[i].revealed)
+
+
+func test_wasted_hp_counts_hearts_thrown_away_by_refills() -> void:
+	Fixture.place(g, 1, 1, Kind.RAT, true)
+	g.player.grant_xp(4)
+	g.press(Vector2i(1, 1))
+	assert_eq(g.player.hp, 5)
+	g.level_up()
+	assert_eq(g.wasted_hp, 4, "levelled at 5 hp: 4 usable hearts wasted")
+	Fixture.place(g, 2, 2, Kind.MEDIKIT, true)
+	g.player.hp = 1
+	g.press(Vector2i(2, 2))
+	assert_eq(g.wasted_hp, 4, "medikit at 1 hp wastes nothing")
+
+
+func test_clear_forecast_sums_board_and_refills() -> void:
+	Fixture.place(g, 0, 0, Kind.SKELETON)
+	Fixture.place(g, 1, 0, Kind.WALL).wall_hp = 3
+	Fixture.place(g, 2, 0, Kind.MINE)
+	Fixture.place(g, 3, 0, Kind.MEDIKIT)
+	Fixture.place(g, 4, 0, Kind.GIANT)
+	var f := g.clear_forecast()
+	assert_eq(f.damage_left, 3 + 3 + 9, "armed mine excluded")
+	assert_eq(f.meds_left, 2)
+	# xp on board 3 + 1 + 9 = 13 -> level 2 (4) and level 3 (5): +5 and +6, then 2 medikits at 6
+	assert_eq(f.budget, 5 + 5 + 6 + 2 * 6)

@@ -14,6 +14,8 @@ var status := Status.GENERATING
 var mines_disarmed := false
 var dragon_defeated := false
 var killed_rats := 0
+## Hearts thrown away by refilling (level up or medikit) while above 1 hp.
+var wasted_hp := 0
 var last_pressed: Tile = null
 var stamps_this_run: Array[String] = []
 var wall_locations: Array[Vector2i] = []
@@ -123,6 +125,7 @@ func level_up() -> Array[GameEvent]:
 	if not can_level_up():
 		return ev
 	var old_hp := player.hp
+	wasted_hp += maxi(old_hp - 1, 0)
 	var heart_index := player.max_hp
 	var full := player.level_up()
 	ev.append(GameEvent.make(GameEvent.Type.LEVEL_UP)
@@ -174,6 +177,45 @@ func book_level(kind: int) -> int:
 	if kind == Kind.MINE and mines_disarmed:
 		return 0
 	return Catalog.level(kind)
+
+
+## What a full clear still needs versus what the run can still afford. Damage left counts every
+## undefeated monster (armed mines excluded, they kill outright) and every remaining wall hit.
+## Budget is the usable hp now plus every refill still reachable: level ups paid by the xp left
+## on the board, and medikits at the max hp they would restore.
+func clear_forecast() -> Dictionary:
+	var damage_left := 0
+	var xp_left := player.xp
+	var meds_left := 0
+	for t in board.tiles:
+		if t.kind == Kind.MINE and not t.defeated:
+			continue
+		if t.is_monster and not t.defeated:
+			damage_left += t.level
+			if t.kind == Kind.GIANT:
+				meds_left += 1
+		if t.is_monster or t.kind == Kind.TREASURE:
+			xp_left += t.xp
+		if t.kind == Kind.WALL:
+			damage_left += t.wall_hp
+			xp_left += t.contains_xp
+		elif t.kind == Kind.CHEST:
+			xp_left += t.contains_xp
+			if t.contains == Kind.MEDIKIT:
+				meds_left += 1
+		elif t.kind == Kind.MEDIKIT:
+			meds_left += 1
+	var budget := maxi(player.hp - 1, 0)
+	var level := player.level
+	var max_hp := player.max_hp
+	while xp_left >= Player.xp_to_next(level):
+		xp_left -= Player.xp_to_next(level)
+		level += 1
+		if max_hp < Player.MAX_HP and not Player.is_half_heart_level(level):
+			max_hp += 1
+		budget += max_hp - 1
+	budget += meds_left * (max_hp - 1)
+	return {"damage_left": damage_left, "budget": budget, "meds_left": meds_left, "wasted": wasted_hp}
 
 
 func _gnome_dodges(t: Tile, ev: Array[GameEvent]) -> void:
@@ -336,6 +378,7 @@ func _use_orb(t: Tile, ev: Array[GameEvent]) -> void:
 
 
 func _use_medikit(t: Tile, ev: Array[GameEvent]) -> void:
+	wasted_hp += maxi(player.hp - 1, 0)
 	if player.hp < player.max_hp:
 		player.hp = player.max_hp
 		ev.append(GameEvent.make(GameEvent.Type.HEALED, t.pos))
