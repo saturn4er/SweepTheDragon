@@ -42,4 +42,4 @@ Sheets used (`sprites/sheets/dawnlike_*.png`):
 
 ## Music
 
-- `assets/audio/music/theme.ogg` is an original chiptune theme written for this project and rendered by `tools/compose_music.py`.
+- `assets/audio/music/theme.ogg` (dungeon theme) and `battle.ogg` (alternate) are original chiptune pieces written for this project and rendered by `tools/compose_music.py`.
