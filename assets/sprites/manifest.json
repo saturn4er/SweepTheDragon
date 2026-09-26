@@ -412,5 +412,14 @@
     "h": 16,
     "anim_sheet": "dawnlike_objects_effect1.png",
     "flip_h": false
+  },
+  "scroll_orb": {
+    "sheet": "dawnlike_items_scroll.png",
+    "x": 64,
+    "y": 16,
+    "w": 16,
+    "h": 16,
+    "anim_sheet": null,
+    "flip_h": false
   }
 }
