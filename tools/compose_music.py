@@ -37,7 +37,11 @@ def sine(p):
 
 
 def bell(p):
-    return math.sin(2 * math.pi * p) * 0.7 + math.sin(2 * math.pi * p * 2.76) * 0.2 + math.sin(2 * math.pi * p * 4.07) * 0.1
+    return math.sin(2 * math.pi * p) * 0.85 + math.sin(2 * math.pi * p * 2.76) * 0.08 + math.sin(2 * math.pi * p * 4.07) * 0.03
+
+
+## Highest lead note allowed. Bars that reach above it are dropped a whole octave.
+LEAD_CAP = midi("F5") if False else 77
 
 
 OUT_DIR = "assets/audio/music"
@@ -120,17 +124,30 @@ class Song:
             for i in range(off, len(buf)):
                 buf[i] += src[i - off] * g
 
-    def melody(self, track, bars, gain, wave_fn, legato=0.92, **kw):
+    def melody(self, track, bars, gain, wave_fn, legato=0.92, cap=None, **kw):
+        cap = LEAD_CAP if cap is None else cap
         beat = 0.0
         for bar in bars:
-            for token in bar.split():
-                name, dur = token.split(":")
-                dur = float(dur)
-                self.play(track, beat, dur * legato, midi(name), gain, wave_fn, **kw)
+            notes = [(midi(t.split(":")[0]), float(t.split(":")[1])) for t in bar.split()]
+            highest = max((m for m, _ in notes if m is not None), default=0)
+            shift = -12 if highest > cap else 0
+            for m, dur in notes:
+                self.play(track, beat, dur * legato, None if m is None else m + shift, gain, wave_fn, **kw)
                 beat += dur
         assert abs(beat - self.bars * self.bpb) < 1e-6, beat
 
+    def lowpass(self, track, cutoff_hz):
+        buf = self.buf(track)
+        a = 1.0 - math.exp(-2.0 * math.pi * cutoff_hz / SR)
+        y = 0.0
+        for i in range(len(buf)):
+            y += a * (buf[i] - y)
+            buf[i] = y
+
     def render(self, path, gains):
+        for track, cutoff in (("lead", 1800.0), ("arp", 1600.0), ("drums", 4500.0), ("pad", 1200.0)):
+            if track in self.buffers:
+                self.lowpass(track, cutoff)
         mix = array.array("d", [0.0]) * self.total
         for name, buf in self.buffers.items():
             g = gains.get(name, 1.0)
