@@ -3,13 +3,17 @@ extends Node2D
 ## Short-lived visual effects over the board: flashes, bursts, rings and floating text.
 
 
+## Maps a board cell to its on-screen top-left corner; the board view sets this.
+var origin: Callable = func(p: Vector2i) -> Vector2: return Vector2(p) * TileView.SIZE
+
+
 func tile_center(p: Vector2i) -> Vector2:
-	return Vector2(p) * TileView.SIZE + TileView.CENTER
+	return origin.call(p) + TileView.CENTER
 
 
 ## Full-tile colour flash that fades out.
 func flash(p: Vector2i, color: Color, duration := 0.25) -> void:
-	var s := UiKit.sprite(SpriteDb.ui("px"), Vector2(p) * TileView.SIZE, false)
+	var s := UiKit.sprite(SpriteDb.ui("px"), origin.call(p), false)
 	s.scale = Vector2(TileView.SIZE / 4.0, TileView.SIZE / 4.0)
 	s.modulate = color
 	add_child(s)

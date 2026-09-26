@@ -70,8 +70,10 @@ $GODOT --headless --path . --export-release iOS export/ios/Dragonsweeper.xcodepr
   editor settings.
 - iOS needs your Apple Team ID in the preset (`application/app_store_team_id` in
   `export_presets.cfg`) before the export runs; it produces an Xcode project to sign and build.
-- Mobile locks to landscape. Marks are set with a long press on touch, right click or shift-click
-  on desktop.
+- The layout follows the screen: landscape shows the 13x10 board with a one-row HUD, portrait
+  (phones held upright, or a narrow desktop window) draws the same board transposed, 10 wide by
+  13 tall, with a two-row HUD. The canvas matches the screen's aspect so nothing is letterboxed.
+- Marks are set with a long press on touch, right click or shift-click on desktop.
 
 ## Debug keys
 

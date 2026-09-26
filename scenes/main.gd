@@ -1,7 +1,8 @@
 extends Node2D
 ## Root scene: owns the Game, wires the views and turns events into sound and effects.
 
-const WORLD_SIZE := Vector2(390, 340)
+const LANDSCAPE := Vector2(390, 340)
+const PORTRAIT := Vector2(300, 431)
 
 var game: Game
 var world: Node2D
@@ -15,14 +16,20 @@ var _restarting := false
 ## Debug x-ray: draws every tile as revealed without touching the game state.
 var xray := false
 var _xray_label: Label
+var bg: ColorRect
+var portrait := false
+## The fixed layout (board plus HUD) and where it sits inside the canvas, which is sized to the
+## window's aspect so nothing is letterboxed.
+var layout_size := LANDSCAPE
+var offset := Vector2.ZERO
 const UNDO_DEPTH := 300
 var _history: Array[Dictionary] = []
 
 
 func _ready() -> void:
-	var bg := ColorRect.new()
+	bg = ColorRect.new()
 	bg.color = UiKit.COL_BG
-	bg.size = WORLD_SIZE
+	bg.size = LANDSCAPE
 	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(bg)
 
@@ -31,7 +38,6 @@ func _ready() -> void:
 	board_view = BoardView.new()
 	world.add_child(board_view)
 	hud = Hud.new()
-	hud.position = Vector2(0, WORLD_SIZE.y - Hud.HEIGHT)
 	world.add_child(hud)
 
 	book = Monsternomicon.new()
@@ -46,8 +52,10 @@ func _ready() -> void:
 	add_child(_xray_label)
 
 	generating = UiKit.label("building dragon lair...", 16, UiKit.COL_TEXT)
-	UiKit.place(generating, WORLD_SIZE * 0.5, 300, 16)
 	add_child(generating)
+
+	get_window().size_changed.connect(_relayout)
+	_relayout()
 
 	board_view.tile_pressed.connect(_on_tile_pressed)
 	board_view.mark_requested.connect(_on_mark_requested)
@@ -61,6 +69,36 @@ func _ready() -> void:
 	new_game()
 	if not OS.get_cmdline_user_args().is_empty() and ResourceLoader.exists("res://tools/dev_harness.gd"):
 		add_child(load("res://tools/dev_harness.gd").new())
+
+
+## Picks landscape or portrait from the window shape and sizes the canvas to the window's aspect.
+func _relayout() -> void:
+	var ws := Vector2(get_window().size)
+	if ws.x <= 0 or ws.y <= 0:
+		return
+	portrait = ws.y > ws.x
+	layout_size = PORTRAIT if portrait else LANDSCAPE
+	var aspect := ws.x / ws.y
+	var logical := layout_size
+	if aspect > layout_size.x / layout_size.y:
+		logical.x = layout_size.y * aspect
+	else:
+		logical.y = layout_size.x / aspect
+	logical = logical.ceil()
+	get_window().content_scale_size = Vector2i(logical)
+	offset = ((logical - layout_size) * 0.5).floor()
+	bg.size = logical
+	world.position = offset
+	board_view.set_portrait(portrait)
+	hud.set_portrait(portrait)
+	hud.position = Vector2(0, layout_size.y - hud.height())
+	var board_area := Vector2(layout_size.x, layout_size.y - hud.height())
+	book.layout(offset, board_area)
+	win.layout(Vector2.ZERO, logical)
+	UiKit.place(generating, offset + layout_size * 0.5, 300, 16)
+	UiKit.place(_xray_label, offset + Vector2(layout_size.x * 0.5, 7), layout_size.x - 4, 12)
+	if game != null:
+		render()
 
 
 func new_game(seed_value := 0) -> void:
@@ -112,7 +150,7 @@ func _on_tile_pressed(p: Vector2i) -> void:
 func _on_mark_requested(p: Vector2i) -> void:
 	if book.visible or not game.is_playing():
 		return
-	board_view.menu.open(p, game.board.at_pos(p).mark, board_view.bounds())
+	board_view.menu.open(p, game.board.at_pos(p).mark, board_view.tile_rect(p), board_view.bounds())
 	Audio.play("open_hover")
 
 
@@ -190,9 +228,9 @@ func _unhandled_input(event: InputEvent) -> void:
 func _process(delta: float) -> void:
 	if _shake_time > 0.0:
 		_shake_time -= delta
-		world.position = Vector2(randf_range(-2, 2), randf_range(-1, 1))
+		world.position = offset + Vector2(randf_range(-2, 2), randf_range(-1, 1))
 		if _shake_time <= 0.0:
-			world.position = Vector2.ZERO
+			world.position = offset
 
 
 func shake(seconds: float) -> void:

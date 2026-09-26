@@ -1,11 +1,10 @@
 class_name BoardView
 extends Node2D
 ## The 13x10 grid of TileViews plus pointer handling: click to press, right-click, shift-click or
-## a long press to open the mark menu.
+## a long press to open the mark menu. In portrait the grid is drawn transposed (10 wide, 13 tall).
 
 signal tile_pressed(pos: Vector2i)
 signal mark_requested(pos: Vector2i)
-signal hero_shortcut
 
 const LONG_PRESS := 0.33
 const ANIM_PERIOD := 0.45
@@ -14,6 +13,7 @@ var tiles: Array[TileView] = []
 var fx: FxLayer
 var menu: MarkMenu
 var input_enabled := true
+var portrait := false
 
 var _pressed_pos := Vector2i(-1, -1)
 var _press_time := 0.0
@@ -39,21 +39,58 @@ func _ready() -> void:
 					bag[i] = bag[j]
 					bag[j] = tmp
 			var tv := TileView.new()
-			tv.position = Vector2(x, y) * TileView.SIZE
 			tv.variant = bag.pop_back()
 			add_child(tv)
 			tiles.append(tv)
 	fx = FxLayer.new()
+	fx.origin = tile_origin
 	add_child(fx)
 	_ring = UiKit.sprite(SpriteDb.ui("ring_0"), Vector2.ZERO)
 	_ring.visible = false
 	add_child(_ring)
 	menu = MarkMenu.new()
 	add_child(menu)
+	_place_tiles()
+
+
+func set_portrait(p: bool) -> void:
+	if portrait == p:
+		return
+	portrait = p
+	_place_tiles()
+	menu.visible = false
+	cancel_press()
+
+
+func _place_tiles() -> void:
+	for y in Board.H:
+		for x in Board.W:
+			tiles[y * Board.W + x].position = tile_origin(Vector2i(x, y))
+
+
+## Top-left corner of a board cell on screen.
+func tile_origin(p: Vector2i) -> Vector2:
+	var d := Vector2(p.y, p.x) if portrait else Vector2(p)
+	return d * TileView.SIZE
+
+
+func tile_rect(p: Vector2i) -> Rect2:
+	return Rect2(tile_origin(p), Vector2(TileView.SIZE, TileView.SIZE))
 
 
 func bounds() -> Rect2:
-	return Rect2(Vector2.ZERO, Vector2(Board.W, Board.H) * TileView.SIZE)
+	var cells := Vector2(Board.H, Board.W) if portrait else Vector2(Board.W, Board.H)
+	return Rect2(Vector2.ZERO, cells * TileView.SIZE)
+
+
+func tile_at(local: Vector2) -> Vector2i:
+	var c := Vector2i(floori(local.x / TileView.SIZE), floori(local.y / TileView.SIZE))
+	var p := Vector2i(c.y, c.x) if portrait else c
+	if p.x < 0 or p.y < 0 or p.x >= Board.W or p.y >= Board.H:
+		return Vector2i(-1, -1)
+	if local.x < 0 or local.y < 0:
+		return Vector2i(-1, -1)
+	return p
 
 
 func render(game: Game, xray := false) -> void:
@@ -62,6 +99,7 @@ func render(game: Game, xray := false) -> void:
 		"board": game.board,
 		"show_all": game.status == Game.Status.DEAD or xray,
 		"xray": xray,
+		"portrait": portrait,
 		"killer": game.last_pressed if game.status == Game.Status.DEAD else null,
 		"walls": game.wall_locations,
 		"chests": game.chest_locations,
@@ -96,13 +134,6 @@ func _process(delta: float) -> void:
 			_pressed_pos = Vector2i(-1, -1)
 
 
-func tile_at(local: Vector2) -> Vector2i:
-	var p := Vector2i(floori(local.x / TileView.SIZE), floori(local.y / TileView.SIZE))
-	if p.x < 0 or p.y < 0 or p.x >= Board.W or p.y >= Board.H:
-		return Vector2i(-1, -1)
-	return p
-
-
 func _unhandled_input(event: InputEvent) -> void:
 	if not input_enabled:
 		return
@@ -132,7 +163,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			_pressed_pos = p
 			_press_time = 0.0
 			_holding = true
-			_ring.position = Vector2(p) * TileView.SIZE + TileView.CENTER
+			_ring.position = tile_origin(p) + TileView.CENTER
 			get_viewport().set_input_as_handled()
 	elif mb.button_index == MOUSE_BUTTON_LEFT and _holding:
 		_holding = false

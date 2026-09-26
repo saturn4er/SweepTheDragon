@@ -27,6 +27,9 @@ func _run() -> void:
 			steps.append(a.trim_prefix("--"))
 		elif a.begins_with("--wait="):
 			wait = float(a.trim_prefix("--wait="))
+		elif a.begins_with("--window="):
+			var wh := a.trim_prefix("--window=").split("x")
+			get_window().size = Vector2i(int(wh[0]), int(wh[1]))
 	if shot == "":
 		return
 	while main._restarting:

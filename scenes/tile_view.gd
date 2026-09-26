@@ -163,13 +163,18 @@ func _render_monster(t: Tile, ctx: Dictionary, frame: int) -> void:
 		level_badge.visible = true
 
 
+## Horizontal screen coordinate of a cell; the board is transposed in portrait.
+static func _sx(p: Vector2i, ctx: Dictionary) -> int:
+	return p.y if ctx.get("portrait", false) else p.x
+
+
 func _face(t: Tile, ctx: Dictionary) -> void:
 	var board: Board = ctx.board
 	match t.kind:
 		Kind.MINOTAUR:
 			if t.minotaur_chest.x >= 0:
 				var chest := board.at_pos(t.minotaur_chest)
-				var flip := t.minotaur_chest.x < t.pos.x
+				var flip := _sx(t.minotaur_chest, ctx) < _sx(t.pos, ctx)
 				icon.flip_h = flip != SpriteDb.flip_h("minotaur")
 				if chest.kind != Kind.CHEST and not t.defeated:
 					startled.visible = true
@@ -177,12 +182,12 @@ func _face(t: Tile, ctx: Dictionary) -> void:
 		Kind.GARGOYLE:
 			for g in board.within_inclusive(t.pos, 1.0):
 				if g.kind == Kind.GARGOYLE and g.role == t.role:
-					if g.pos.x != t.pos.x:
-						icon.flip_h = (g.pos.x < t.pos.x) != SpriteDb.flip_h("gargoyle")
+					if _sx(g.pos, ctx) != _sx(t.pos, ctx):
+						icon.flip_h = (_sx(g.pos, ctx) < _sx(t.pos, ctx)) != SpriteDb.flip_h("gargoyle")
 		Kind.RAT:
 			var king: Tile = ctx.rat_king
-			if king != null and king.pos.x != t.pos.x:
-				icon.flip_h = (king.pos.x < t.pos.x) != SpriteDb.flip_h("rat")
+			if king != null and _sx(king.pos, ctx) != _sx(t.pos, ctx):
+				icon.flip_h = (_sx(king.pos, ctx) < _sx(t.pos, ctx)) != SpriteDb.flip_h("rat")
 		Kind.GIANT:
 			if t.role == "juliet":
 				icon.flip_h = not icon.flip_h

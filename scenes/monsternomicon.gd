@@ -36,6 +36,14 @@ func _ready() -> void:
 	_show_page(0)
 
 
+## Fits the book into the given area (the board part of the screen), scaling down on narrow
+## screens. `offset` is where that area starts in canvas coordinates.
+func layout(offset: Vector2, area: Vector2) -> void:
+	var s := minf(1.0, minf((area.x - 8.0) / PANEL_SIZE.x, (area.y - 8.0) / PANEL_SIZE.y))
+	scale = Vector2(s, s)
+	position = (offset + (area - PANEL_SIZE * s) * 0.5).floor()
+
+
 func _left_center_x() -> float:
 	return PANEL_SIZE.x * 0.25
 

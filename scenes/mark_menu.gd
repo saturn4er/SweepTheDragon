@@ -27,7 +27,7 @@ func is_open() -> bool:
 	return visible
 
 
-func open(p: Vector2i, current_mark: int, bounds: Rect2) -> void:
+func open(p: Vector2i, current_mark: int, tile_rect: Rect2, bounds: Rect2) -> void:
 	tile_pos = p
 	for b in _buttons:
 		b.queue_free()
@@ -35,7 +35,6 @@ func open(p: Vector2i, current_mark: int, bounds: Rect2) -> void:
 	_rects.clear()
 	_marks.clear()
 	_hovered = -1
-	var tile_rect := Rect2(Vector2(p) * TileView.SIZE, Vector2(TileView.SIZE, TileView.SIZE))
 	_select.position = tile_rect.position
 	var total := Vector2(4 * BUTTON, 4 * BUTTON)
 	var base := Vector2(tile_rect.end.x, tile_rect.position.y - total.y * 0.5 + BUTTON * 0.5)
