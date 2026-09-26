@@ -31,12 +31,12 @@ func _ready() -> void:
 	UiKit.place(number, CENTER + Vector2(0, 0), 30, 16)
 	add_child(number)
 	level_badge = UiKit.label("", 12, UiKit.COL_ORANGE, 2)
-	UiKit.place(level_badge, Vector2(16, 24), 30, 12)
+	UiKit.place(level_badge, Vector2(16, 22), 30, 12)
 	add_child(level_badge)
-	xp_star = UiKit.sprite(SpriteDb.ui("xp_star"), Vector2(11, 24))
+	xp_star = UiKit.sprite(SpriteDb.ui("xp_star"), Vector2(11, 22))
 	add_child(xp_star)
 	xp_badge = UiKit.label("", 12, UiKit.COL_YELLOW, 2)
-	UiKit.place(xp_badge, Vector2(19, 24), 20, 12)
+	UiKit.place(xp_badge, Vector2(19, 22), 20, 12)
 	add_child(xp_badge)
 	mark_icon = UiKit.sprite(null, CENTER)
 	add_child(mark_icon)
@@ -193,8 +193,8 @@ func _show_xp(xp: int) -> void:
 	xp_badge.text = str(xp)
 	xp_badge.visible = true
 	var wide := xp >= 10
-	xp_star.position = Vector2(8 if wide else 11, 24)
-	UiKit.place(xp_badge, Vector2(19 if wide else 19, 24), 20, 12)
+	xp_star.position = Vector2(8 if wide else 11, 22)
+	UiKit.place(xp_badge, Vector2(19, 22), 20, 12)
 
 
 func _render_mark(mark: int) -> void:

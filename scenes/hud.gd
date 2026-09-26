@@ -6,7 +6,7 @@ signal hero_pressed
 signal book_pressed
 
 const HEIGHT := 41
-const HEARTS_X := 88
+const HEARTS_X := 100
 const HEART_STEP := 13
 const HEART_GROUP_GAP := 4
 const GEM_STEP := 8
@@ -37,8 +37,7 @@ var _book_read := false
 func _ready() -> void:
 	add_child(UiKit.sprite(SpriteDb.ui("hud_panel"), Vector2.ZERO, false))
 	var jorge := UiKit.label("Jorge", 12, UiKit.COL_TEXT)
-	jorge.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
-	UiKit.place(jorge, Vector2(26, 21), 48, 12)
+	UiKit.place(jorge, Vector2(26, 21), 52, 12)
 	add_child(jorge)
 	hero_bg = UiKit.sprite(SpriteDb.ui("hero_button_off"), HERO_RECT.position, false)
 	add_child(hero_bg)
@@ -65,12 +64,12 @@ func _ready() -> void:
 	add_child(book_icon)
 	death_label = UiKit.label("", 16, UiKit.COL_TEXT)
 	death_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
-	UiKit.place(death_label, Vector2(HEARTS_X + 100, 13), 200, 16)
+	UiKit.place(death_label, Vector2(HEARTS_X + 96, 13), 200, 16)
 	death_label.visible = false
 	add_child(death_label)
 	restart_label = UiKit.label("< restart", 16, UiKit.COL_ORANGE)
 	restart_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
-	UiKit.place(restart_label, Vector2(HEARTS_X + 100, 29), 200, 16)
+	UiKit.place(restart_label, Vector2(HEARTS_X + 96, 29), 200, 16)
 	restart_label.visible = false
 	add_child(restart_label)
 
@@ -98,8 +97,6 @@ func render(game: Game) -> void:
 			h.texture = SpriteDb.ui("heart_full")
 		elif i < p.max_hp:
 			h.texture = SpriteDb.ui("heart_empty")
-		elif i == p.max_hp and Player.is_half_heart_level(p.level) and p.max_hp < Player.MAX_HP:
-			h.texture = SpriteDb.ui("heart_half")
 		else:
 			h.texture = SpriteDb.ui("heart_blank")
 

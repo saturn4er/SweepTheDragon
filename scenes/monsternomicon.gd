@@ -48,8 +48,8 @@ func _build_page0() -> void:
 	var pg := Node2D.new()
 	add_child(pg)
 	_pages.append(pg)
-	var title := UiKit.label("Monsternomicon", 16, UiKit.COL_BOOK)
-	UiKit.place(title, Vector2(_left_center_x(), 26), 180, 16)
+	var title := UiKit.label("Monsternomicon", 14, UiKit.COL_BOOK)
+	UiKit.place(title, Vector2(_left_center_x(), 26), 180, 14)
 	pg.add_child(title)
 
 	var touch := DisplayServer.is_touchscreen_available()
@@ -69,11 +69,11 @@ func _build_page0() -> void:
 		pg.add_child(l)
 		y += 16
 
-	var note1 := UiKit.label("observe monster", 16, UiKit.COL_BOOK)
-	UiKit.place(note1, Vector2(_left_center_x(), 200), 180, 16)
+	var note1 := UiKit.label("observe monster", 12, UiKit.COL_BOOK)
+	UiKit.place(note1, Vector2(_left_center_x(), 200), 180, 12)
 	pg.add_child(note1)
-	var note2 := UiKit.label("patterns when dead", 16, UiKit.COL_BOOK)
-	UiKit.place(note2, Vector2(_left_center_x(), 214), 180, 16)
+	var note2 := UiKit.label("patterns when dead", 12, UiKit.COL_BOOK)
+	UiKit.place(note2, Vector2(_left_center_x(), 213), 180, 12)
 	pg.add_child(note2)
 
 	_sound_rect = Rect2(12, 248, 84, 20)
@@ -91,14 +91,14 @@ func _build_page0() -> void:
 		var icon := UiKit.sprite(SpriteDb.sprite(name), Vector2(cx, cy))
 		icon.flip_h = SpriteDb.flip_h(name)
 		pg.add_child(icon)
-		var lvl := UiKit.label("", 16, UiKit.COL_ORANGE, 2)
+		var lvl := UiKit.label("", 12, UiKit.COL_ORANGE, 2)
 		lvl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-		UiKit.place(lvl, Vector2(cx - 27, cy), 30, 16)
+		UiKit.place(lvl, Vector2(cx - 27, cy), 30, 12)
 		pg.add_child(lvl)
 		_level_labels[kind] = lvl
-		var cnt := UiKit.label("", 16, UiKit.COL_BOOK)
+		var cnt := UiKit.label("", 12, UiKit.COL_BOOK)
 		cnt.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
-		UiKit.place(cnt, Vector2(cx + 32, cy), 40, 16)
+		UiKit.place(cnt, Vector2(cx + 32, cy), 40, 12)
 		pg.add_child(cnt)
 		_count_labels[kind] = cnt
 		row += 1
@@ -106,9 +106,9 @@ func _build_page0() -> void:
 			row = 0
 			col += 1
 
-	var ver := UiKit.label(VERSION, 16, UiKit.COL_BOOK_SOFT)
+	var ver := UiKit.label(VERSION, 12, UiKit.COL_BOOK_SOFT)
 	_version_rect = Rect2(PANEL_SIZE.x * 0.5 + 8, PANEL_SIZE.y - 26, 60, 18)
-	UiKit.place(ver, _version_rect.get_center(), 60, 16)
+	UiKit.place(ver, _version_rect.get_center(), 60, 12)
 	pg.add_child(ver)
 	_platino = UiKit.sprite(SpriteDb.sprite("platino"), _version_rect.get_center() + Vector2(40, 0))
 	_platino.visible = false
@@ -133,8 +133,8 @@ func _build_page1() -> void:
 	var pg := Node2D.new()
 	add_child(pg)
 	_pages.append(pg)
-	var title := UiKit.label("** stamps **", 16, UiKit.COL_BOOK)
-	UiKit.place(title, Vector2(_left_center_x(), 30), 180, 16)
+	var title := UiKit.label("** stamps **", 14, UiKit.COL_BOOK)
+	UiKit.place(title, Vector2(_left_center_x(), 30), 180, 14)
 	pg.add_child(title)
 	var y := 66.0
 	for i in Stamps.ALL.size():
@@ -142,13 +142,13 @@ func _build_page1() -> void:
 		pg.add_child(s)
 		_stamp_sprites.append(s)
 		var desc: Array = Stamps.DESCRIPTIONS[Stamps.ALL[i]]
-		var l1 := UiKit.label(desc[0], 16, UiKit.COL_BOOK)
+		var l1 := UiKit.label(desc[0], 12, UiKit.COL_BOOK)
 		l1.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
-		UiKit.place(l1, Vector2(120, y - 8), 134, 16)
+		UiKit.place(l1, Vector2(120, y - 7), 134, 12)
 		pg.add_child(l1)
-		var l2 := UiKit.label(desc[1], 16, UiKit.COL_BOOK)
+		var l2 := UiKit.label(desc[1], 12, UiKit.COL_BOOK)
 		l2.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
-		UiKit.place(l2, Vector2(120, y + 8), 134, 16)
+		UiKit.place(l2, Vector2(120, y + 7), 134, 12)
 		pg.add_child(l2)
 		y += 46
 
