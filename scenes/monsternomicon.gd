@@ -176,7 +176,7 @@ func _build_page1() -> void:
 		"(cc-by 4.0)",
 		"",
 		"fonts, sounds: kenney",
-		"ambience: opengameart",
+		"music: original chiptune",
 		"",
 		"made with godot",
 	]
