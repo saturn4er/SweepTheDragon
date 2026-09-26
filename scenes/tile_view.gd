@@ -133,7 +133,7 @@ func _render_monster(t: Tile, ctx: Dictionary, frame: int) -> void:
 	icon.flip_h = SpriteDb.flip_h(name)
 	icon.position = CENTER + Vector2(0, -5)
 	icon.visible = true
-	if t.mimicking:
+	if t.mimicking and not ctx.get("xray", false):
 		icon.texture = SpriteDb.sprite("chest")
 		icon.position = CENTER
 		icon.flip_h = false
@@ -158,7 +158,7 @@ func _render_monster(t: Tile, ctx: Dictionary, frame: int) -> void:
 		icon.position = CENTER
 	elif t.kind == Kind.GNOME:
 		pass
-	elif not t.mimicking:
+	elif not t.mimicking or ctx.get("xray", false):
 		level_badge.text = str(t.level)
 		level_badge.visible = true
 

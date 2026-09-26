@@ -27,12 +27,9 @@
     "flip_h": false
   },
   "rat_king": {
-    "sheet": "dawnlike_rodent0.png",
-    "x": 0,
-    "y": 48,
+    "file": "icons/rat_king.png",
     "w": 16,
     "h": 16,
-    "anim_sheet": "dawnlike_rodent1.png",
     "flip_h": false
   },
   "bat": {
@@ -117,12 +114,9 @@
     "flip_h": false
   },
   "mine_king": {
-    "sheet": "dawnlike_elemental0.png",
-    "x": 16,
-    "y": 16,
+    "file": "icons/mine_king.png",
     "w": 16,
     "h": 16,
-    "anim_sheet": "dawnlike_elemental1.png",
     "flip_h": false
   },
   "mimic": {
@@ -243,30 +237,21 @@
     "flip_h": false
   },
   "scroll_rats": {
-    "sheet": "dawnlike_items_scroll.png",
-    "x": 48,
-    "y": 16,
+    "file": "icons/scroll_rats.png",
     "w": 16,
     "h": 16,
-    "anim_sheet": null,
     "flip_h": false
   },
   "scroll_slimes": {
-    "sheet": "dawnlike_items_scroll.png",
-    "x": 96,
-    "y": 16,
+    "file": "icons/scroll_slimes.png",
     "w": 16,
     "h": 16,
-    "anim_sheet": null,
     "flip_h": false
   },
   "scroll_disarm": {
-    "sheet": "dawnlike_items_scroll.png",
-    "x": 48,
-    "y": 0,
+    "file": "icons/scroll_disarm.png",
     "w": 16,
     "h": 16,
-    "anim_sheet": null,
     "flip_h": false
   },
   "crown": {
@@ -279,21 +264,15 @@
     "flip_h": false
   },
   "mine": {
-    "sheet": "dawnlike_items_rock.png",
-    "x": 16,
-    "y": 0,
+    "file": "icons/mine.png",
     "w": 16,
     "h": 16,
-    "anim_sheet": null,
     "flip_h": false
   },
   "mine_dead": {
-    "sheet": "dawnlike_objects_trap0.png",
-    "x": 64,
-    "y": 32,
+    "file": "icons/mine_dead.png",
     "w": 16,
     "h": 16,
-    "anim_sheet": null,
     "flip_h": false
   },
   "wall": {
@@ -414,12 +393,9 @@
     "flip_h": false
   },
   "scroll_orb": {
-    "sheet": "dawnlike_items_scroll.png",
-    "x": 64,
-    "y": 16,
+    "file": "icons/scroll_orb.png",
     "w": 16,
     "h": 16,
-    "anim_sheet": null,
     "flip_h": false
   }
 }

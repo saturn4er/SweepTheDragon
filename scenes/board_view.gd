@@ -56,11 +56,12 @@ func bounds() -> Rect2:
 	return Rect2(Vector2.ZERO, Vector2(Board.W, Board.H) * TileView.SIZE)
 
 
-func render(game: Game) -> void:
+func render(game: Game, xray := false) -> void:
 	_board = game.board
 	_ctx = {
 		"board": game.board,
-		"show_all": game.status == Game.Status.DEAD,
+		"show_all": game.status == Game.Status.DEAD or xray,
+		"xray": xray,
 		"killer": game.last_pressed if game.status == Game.Status.DEAD else null,
 		"walls": game.wall_locations,
 		"chests": game.chest_locations,

@@ -5,6 +5,7 @@ class_name SpriteDb
 const MANIFEST := "res://assets/sprites/manifest.json"
 const SHEETS := "res://assets/sprites/sheets/"
 const UI := "res://assets/sprites/ui/"
+const ROOT := "res://assets/sprites/"
 
 static var _manifest := {}
 static var _loaded := false
@@ -34,7 +35,11 @@ static func sprite(name: String, frame := 0) -> Texture2D:
 	if _cache.has(key):
 		return _cache[key]
 	var tex: Texture2D
-	if _manifest.has(name):
+	if _manifest.has(name) and _manifest[name].has("file"):
+		var path := ROOT + str(_manifest[name]["file"])
+		if ResourceLoader.exists(path):
+			tex = load(path)
+	elif _manifest.has(name):
 		var def: Dictionary = _manifest[name]
 		var sheet_name: String = str(def.get("sheet", ""))
 		if frame == 1 and def.get("anim_sheet") != null and str(def.get("anim_sheet")) != "":

@@ -51,6 +51,9 @@ func _run() -> void:
 				main._toggle_book()
 			"page":
 				main.book._show_page(1)
+			"xray":
+				main.xray = not main.xray
+				main.render()
 			"mark":
 				main._on_mark_requested(Vector2i(4, 4))
 			"win":

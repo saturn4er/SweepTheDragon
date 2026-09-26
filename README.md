@@ -65,9 +65,14 @@ $GODOT --headless --path . --export-release iOS export/ios/Dragonsweeper.xcodepr
 - Mobile locks to landscape. Marks are set with a long press on touch, right click or shift-click
   on desktop.
 
+## Debug keys
+
+- `X` or `F9` toggles x-ray: every tile is drawn revealed (mimics unmasked) without changing the game.
+- `R` restarts, `F11` toggles fullscreen, `Escape` closes the book.
+
 ## Regenerating the UI art
 
-Tiles, hearts, gems, marks and panels are drawn by `tools/gen_ui_art.gd`:
+Tiles, hearts, gems, marks and panels are drawn by `tools/gen_ui_art.gd`; bombs, the mine and rat kings and the scrolls by `tools/gen_icons.gd`:
 
 ```sh
 $GODOT --headless --path . -s tools/gen_ui_art.gd

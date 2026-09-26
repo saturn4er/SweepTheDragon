@@ -12,6 +12,9 @@ var win: WinScreen
 var generating: Label
 var _shake_time := 0.0
 var _restarting := false
+## Debug x-ray: draws every tile as revealed without touching the game state.
+var xray := false
+var _xray_label: Label
 
 
 func _ready() -> void:
@@ -33,6 +36,11 @@ func _ready() -> void:
 	add_child(book)
 	win = WinScreen.new()
 	add_child(win)
+
+	_xray_label = UiKit.label("x-ray", 12, UiKit.COL_RED, 2)
+	UiKit.place(_xray_label, Vector2(30, 8), 60, 12)
+	_xray_label.visible = false
+	add_child(_xray_label)
 
 	generating = UiKit.label("building dragon lair...", 16, UiKit.COL_TEXT)
 	UiKit.place(generating, WORLD_SIZE * 0.5, 300, 16)
@@ -73,7 +81,8 @@ func new_game(seed_value := 0) -> void:
 
 
 func render() -> void:
-	board_view.render(game)
+	board_view.render(game, xray)
+	_xray_label.visible = xray
 	hud.render(game)
 	if book.visible:
 		book.refresh()
@@ -135,6 +144,10 @@ func _toggle_book() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("restart") and not win.visible:
 		_restart()
+		get_viewport().set_input_as_handled()
+	elif event.is_action_pressed("cheat_reveal"):
+		xray = not xray
+		render()
 		get_viewport().set_input_as_handled()
 	elif event.is_action_pressed("fullscreen"):
 		var fs := DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_FULLSCREEN
