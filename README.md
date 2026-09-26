@@ -1,5 +1,7 @@
 # Dragonsweeper (Godot clone)
 
+Play the web build: https://saturn4er.github.io/SweepTheDragon/
+
 A faithful reimplementation of Daniel Benmergui's [Dragonsweeper](https://danielben.itch.io/dragonsweeper)
 in Godot 4.7 with GDScript. One project exports to Web, macOS, Windows, Linux, Android and iOS.
 
@@ -41,6 +43,12 @@ The dev harness drives the game from command-line args, useful for checking stat
 ```sh
 $GODOT --path . -- --shot=/tmp/shot.png --seed=2024 --press=10,4 --press=3,3 --press=hero --press=book
 ```
+
+## Continuous deployment
+
+Every push to `main` runs `.github/workflows/deploy.yml`: it downloads Godot 4.7.2 and the web export
+template (cached between runs), runs the GUT tests, exports the Web preset and publishes it to
+GitHub Pages.
 
 ## Export
 
