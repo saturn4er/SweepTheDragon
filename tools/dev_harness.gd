@@ -27,7 +27,8 @@ func _run() -> void:
 			wait = float(a.trim_prefix("--wait="))
 	if shot == "":
 		return
-	await get_tree().process_frame
+	while main._restarting:
+		await get_tree().process_frame
 	if seed_value != 0:
 		await main.new_game(seed_value)
 	for _i in 4:
@@ -38,6 +39,8 @@ func _run() -> void:
 				main._on_hero_pressed()
 			"book":
 				main._toggle_book()
+			"page":
+				main.book._show_page(1)
 			"mark":
 				main._on_mark_requested(Vector2i(4, 4))
 			"win":

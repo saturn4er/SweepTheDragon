@@ -39,3 +39,8 @@ Sheets used (`sprites/sheets/dawnlike_*.png`):
 - Objects/Effect0 + Effect1: fx_hit, fx_sparkle, fx_explosion, fx_smoke
 - GUI/GUI0: heart
 - GUI/SDS_8x8.ttf (`fonts/sds_8x8.ttf`)
+
+## Music
+
+- **Loopable Dungeon Ambience** (`assets/audio/music/theme.ogg`) from OpenGameArt, CC0.
+  https://opengameart.org/content/loopable-dungeon-ambience

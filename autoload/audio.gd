@@ -23,6 +23,8 @@ func _ready() -> void:
 	add_child(_music)
 	if ResourceLoader.exists(MUSIC):
 		_music.stream = load(MUSIC)
+		if _music.stream is AudioStreamOggVorbis:
+			_music.stream.loop = true
 	_load_index()
 	Settings.changed.connect(_apply_music_setting)
 
