@@ -1,0 +1,416 @@
+{
+  "hero": {
+    "sheet": "kenney_tiny_dungeon.png",
+    "x": 0,
+    "y": 128,
+    "w": 16,
+    "h": 16,
+    "anim_sheet": null,
+    "flip_h": false
+  },
+  "hero_alt": {
+    "sheet": "kenney_tiny_dungeon.png",
+    "x": 16,
+    "y": 128,
+    "w": 16,
+    "h": 16,
+    "anim_sheet": null,
+    "flip_h": false
+  },
+  "rat": {
+    "sheet": "dawnlike_rodent0.png",
+    "x": 32,
+    "y": 32,
+    "w": 16,
+    "h": 16,
+    "anim_sheet": "dawnlike_rodent1.png",
+    "flip_h": false
+  },
+  "rat_king": {
+    "sheet": "dawnlike_rodent0.png",
+    "x": 0,
+    "y": 48,
+    "w": 16,
+    "h": 16,
+    "anim_sheet": "dawnlike_rodent1.png",
+    "flip_h": false
+  },
+  "bat": {
+    "sheet": "dawnlike_avian0.png",
+    "x": 32,
+    "y": 176,
+    "w": 16,
+    "h": 16,
+    "anim_sheet": "dawnlike_avian1.png",
+    "flip_h": false
+  },
+  "skeleton": {
+    "sheet": "dawnlike_undead0.png",
+    "x": 0,
+    "y": 16,
+    "w": 16,
+    "h": 16,
+    "anim_sheet": "dawnlike_undead1.png",
+    "flip_h": false
+  },
+  "gargoyle": {
+    "sheet": "dawnlike_misc0.png",
+    "x": 0,
+    "y": 80,
+    "w": 16,
+    "h": 16,
+    "anim_sheet": "dawnlike_misc1.png",
+    "flip_h": false
+  },
+  "slime": {
+    "sheet": "dawnlike_slime0.png",
+    "x": 48,
+    "y": 0,
+    "w": 16,
+    "h": 16,
+    "anim_sheet": "dawnlike_slime1.png",
+    "flip_h": false
+  },
+  "big_slime": {
+    "sheet": "dawnlike_slime0.png",
+    "x": 0,
+    "y": 16,
+    "w": 16,
+    "h": 16,
+    "anim_sheet": "dawnlike_slime1.png",
+    "flip_h": false
+  },
+  "minotaur": {
+    "sheet": "dawnlike_demon0.png",
+    "x": 32,
+    "y": 16,
+    "w": 16,
+    "h": 16,
+    "anim_sheet": "dawnlike_demon1.png",
+    "flip_h": false
+  },
+  "guardian": {
+    "sheet": "dawnlike_humanoid0.png",
+    "x": 0,
+    "y": 272,
+    "w": 16,
+    "h": 16,
+    "anim_sheet": "dawnlike_humanoid1.png",
+    "flip_h": false
+  },
+  "giant_romeo": {
+    "sheet": "dawnlike_humanoid0.png",
+    "x": 16,
+    "y": 0,
+    "w": 16,
+    "h": 16,
+    "anim_sheet": "dawnlike_humanoid1.png",
+    "flip_h": false
+  },
+  "giant_juliet": {
+    "sheet": "dawnlike_humanoid0.png",
+    "x": 48,
+    "y": 0,
+    "w": 16,
+    "h": 16,
+    "anim_sheet": "dawnlike_humanoid1.png",
+    "flip_h": false
+  },
+  "mine_king": {
+    "sheet": "dawnlike_elemental0.png",
+    "x": 16,
+    "y": 16,
+    "w": 16,
+    "h": 16,
+    "anim_sheet": "dawnlike_elemental1.png",
+    "flip_h": false
+  },
+  "mimic": {
+    "sheet": "kenney_tiny_dungeon.png",
+    "x": 128,
+    "y": 112,
+    "w": 16,
+    "h": 16,
+    "anim_sheet": null,
+    "flip_h": false
+  },
+  "dragon": {
+    "sheet": "dawnlike_reptile0.png",
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16,
+    "anim_sheet": "dawnlike_reptile1.png",
+    "flip_h": false
+  },
+  "dragon_egg": {
+    "sheet": "dawnlike_items_food.png",
+    "x": 48,
+    "y": 16,
+    "w": 16,
+    "h": 16,
+    "anim_sheet": null,
+    "flip_h": false
+  },
+  "gazer": {
+    "sheet": "dawnlike_elemental0.png",
+    "x": 32,
+    "y": 80,
+    "w": 16,
+    "h": 16,
+    "anim_sheet": "dawnlike_elemental1.png",
+    "flip_h": false
+  },
+  "gnome": {
+    "sheet": "dawnlike_humanoid0.png",
+    "x": 0,
+    "y": 128,
+    "w": 16,
+    "h": 16,
+    "anim_sheet": "dawnlike_humanoid1.png",
+    "flip_h": false
+  },
+  "wizard": {
+    "sheet": "kenney_tiny_dungeon.png",
+    "x": 0,
+    "y": 112,
+    "w": 16,
+    "h": 16,
+    "anim_sheet": null,
+    "flip_h": false
+  },
+  "chest": {
+    "sheet": "kenney_tiny_dungeon.png",
+    "x": 80,
+    "y": 112,
+    "w": 16,
+    "h": 16,
+    "anim_sheet": null,
+    "flip_h": false
+  },
+  "chest_open": {
+    "sheet": "kenney_tiny_dungeon.png",
+    "x": 96,
+    "y": 112,
+    "w": 16,
+    "h": 16,
+    "anim_sheet": null,
+    "flip_h": false
+  },
+  "medikit": {
+    "sheet": "kenney_tiny_dungeon.png",
+    "x": 112,
+    "y": 144,
+    "w": 16,
+    "h": 16,
+    "anim_sheet": null,
+    "flip_h": false
+  },
+  "treasure_1": {
+    "sheet": "dawnlike_items_money.png",
+    "x": 32,
+    "y": 0,
+    "w": 16,
+    "h": 16,
+    "anim_sheet": null,
+    "flip_h": false
+  },
+  "treasure_3": {
+    "sheet": "dawnlike_items_money.png",
+    "x": 16,
+    "y": 0,
+    "w": 16,
+    "h": 16,
+    "anim_sheet": null,
+    "flip_h": false
+  },
+  "treasure_5": {
+    "sheet": "dawnlike_items_money.png",
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16,
+    "anim_sheet": null,
+    "flip_h": false
+  },
+  "orb": {
+    "sheet": "dawnlike_items_tool.png",
+    "x": 16,
+    "y": 0,
+    "w": 16,
+    "h": 16,
+    "anim_sheet": null,
+    "flip_h": false
+  },
+  "scroll_rats": {
+    "sheet": "dawnlike_items_scroll.png",
+    "x": 48,
+    "y": 16,
+    "w": 16,
+    "h": 16,
+    "anim_sheet": null,
+    "flip_h": false
+  },
+  "scroll_slimes": {
+    "sheet": "dawnlike_items_scroll.png",
+    "x": 96,
+    "y": 16,
+    "w": 16,
+    "h": 16,
+    "anim_sheet": null,
+    "flip_h": false
+  },
+  "scroll_disarm": {
+    "sheet": "dawnlike_items_scroll.png",
+    "x": 48,
+    "y": 0,
+    "w": 16,
+    "h": 16,
+    "anim_sheet": null,
+    "flip_h": false
+  },
+  "crown": {
+    "sheet": "dawnlike_items_hat.png",
+    "x": 32,
+    "y": 48,
+    "w": 16,
+    "h": 16,
+    "anim_sheet": null,
+    "flip_h": false
+  },
+  "mine": {
+    "sheet": "dawnlike_items_rock.png",
+    "x": 16,
+    "y": 0,
+    "w": 16,
+    "h": 16,
+    "anim_sheet": null,
+    "flip_h": false
+  },
+  "mine_dead": {
+    "sheet": "dawnlike_objects_trap0.png",
+    "x": 64,
+    "y": 32,
+    "w": 16,
+    "h": 16,
+    "anim_sheet": null,
+    "flip_h": false
+  },
+  "wall": {
+    "sheet": "dawnlike_items_rock.png",
+    "x": 32,
+    "y": 16,
+    "w": 16,
+    "h": 16,
+    "anim_sheet": null,
+    "flip_h": false
+  },
+  "wall_cracked": {
+    "sheet": "dawnlike_items_rock.png",
+    "x": 48,
+    "y": 16,
+    "w": 16,
+    "h": 16,
+    "anim_sheet": null,
+    "flip_h": false
+  },
+  "floor_rubble": {
+    "sheet": "dawnlike_objects_ground0.png",
+    "x": 96,
+    "y": 16,
+    "w": 16,
+    "h": 16,
+    "anim_sheet": null,
+    "flip_h": false
+  },
+  "floor_chest_mark": {
+    "sheet": "dawnlike_objects_decor0.png",
+    "x": 96,
+    "y": 144,
+    "w": 16,
+    "h": 16,
+    "anim_sheet": null,
+    "flip_h": false
+  },
+  "book": {
+    "sheet": "dawnlike_items_book.png",
+    "x": 112,
+    "y": 112,
+    "w": 16,
+    "h": 16,
+    "anim_sheet": null,
+    "flip_h": false
+  },
+  "skull": {
+    "sheet": "dawnlike_objects_decor0.png",
+    "x": 0,
+    "y": 192,
+    "w": 16,
+    "h": 16,
+    "anim_sheet": null,
+    "flip_h": false
+  },
+  "platino": {
+    "sheet": "dawnlike_reptile0.png",
+    "x": 48,
+    "y": 192,
+    "w": 16,
+    "h": 16,
+    "anim_sheet": "dawnlike_reptile1.png",
+    "flip_h": false
+  },
+  "heart": {
+    "sheet": "dawnlike_gui0.png",
+    "x": 0,
+    "y": 16,
+    "w": 16,
+    "h": 16,
+    "anim_sheet": null,
+    "flip_h": false
+  },
+  "xp_gem": {
+    "sheet": "dawnlike_items_money.png",
+    "x": 96,
+    "y": 32,
+    "w": 16,
+    "h": 16,
+    "anim_sheet": null,
+    "flip_h": false
+  },
+  "fx_hit": {
+    "sheet": "dawnlike_objects_effect0.png",
+    "x": 96,
+    "y": 368,
+    "w": 16,
+    "h": 16,
+    "anim_sheet": "dawnlike_objects_effect1.png",
+    "flip_h": false
+  },
+  "fx_sparkle": {
+    "sheet": "dawnlike_objects_effect0.png",
+    "x": 96,
+    "y": 336,
+    "w": 16,
+    "h": 16,
+    "anim_sheet": null,
+    "flip_h": false
+  },
+  "fx_explosion": {
+    "sheet": "dawnlike_objects_effect0.png",
+    "x": 16,
+    "y": 336,
+    "w": 16,
+    "h": 16,
+    "anim_sheet": "dawnlike_objects_effect1.png",
+    "flip_h": false
+  },
+  "fx_smoke": {
+    "sheet": "dawnlike_objects_effect0.png",
+    "x": 48,
+    "y": 336,
+    "w": 16,
+    "h": 16,
+    "anim_sheet": "dawnlike_objects_effect1.png",
+    "flip_h": false
+  }
+}

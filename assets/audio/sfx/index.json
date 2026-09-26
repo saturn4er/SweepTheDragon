@@ -1,0 +1,116 @@
+{
+  "uncover": [
+    "uncover_1.ogg",
+    "uncover_2.ogg",
+    "uncover_3.ogg",
+    "uncover_4.ogg",
+    "uncover_5.ogg"
+  ],
+  "reveal": [
+    "reveal_1.ogg",
+    "reveal_2.ogg"
+  ],
+  "fight": [
+    "fight_1.ogg",
+    "fight_2.ogg",
+    "fight_3.ogg"
+  ],
+  "fight_special": [
+    "fight_special_1.ogg",
+    "fight_special_2.ogg"
+  ],
+  "pick_xp": [
+    "pick_xp_1.ogg",
+    "pick_xp_2.ogg"
+  ],
+  "heal": [
+    "heal_1.ogg"
+  ],
+  "level_up": [
+    "level_up_1.ogg"
+  ],
+  "can_level": [
+    "can_level_1.ogg"
+  ],
+  "alarm": [
+    "alarm_1.ogg"
+  ],
+  "lose": [
+    "lose_1.ogg"
+  ],
+  "win": [
+    "win_1.ogg"
+  ],
+  "explode": [
+    "explode_1.ogg",
+    "explode_2.ogg"
+  ],
+  "hit_wall": [
+    "hit_wall_1.ogg",
+    "hit_wall_2.ogg",
+    "hit_wall_3.ogg"
+  ],
+  "wall_down": [
+    "wall_down_1.ogg",
+    "wall_down_2.ogg"
+  ],
+  "chest_open": [
+    "chest_open_1.ogg"
+  ],
+  "restart": [
+    "restart_1.ogg"
+  ],
+  "spell": [
+    "spell_1.ogg"
+  ],
+  "earthquake": [
+    "earthquake_1.ogg"
+  ],
+  "book": [
+    "book_1.ogg"
+  ],
+  "book_close": [
+    "book_close_1.ogg"
+  ],
+  "pageflip": [
+    "pageflip_1.ogg",
+    "pageflip_2.ogg",
+    "pageflip_3.ogg"
+  ],
+  "mark": [
+    "mark_1.ogg"
+  ],
+  "remove_mark": [
+    "remove_mark_1.ogg",
+    "remove_mark_2.ogg"
+  ],
+  "open_hover": [
+    "open_hover_1.ogg"
+  ],
+  "close_hover": [
+    "close_hover_1.ogg"
+  ],
+  "wrong": [
+    "wrong_1.ogg",
+    "wrong_2.ogg",
+    "wrong_3.ogg"
+  ],
+  "jorge": [
+    "jorge_1.ogg",
+    "jorge_2.ogg"
+  ],
+  "gnome_jump": [
+    "gnome_jump_1.ogg",
+    "gnome_jump_2.ogg"
+  ],
+  "disappointed": [
+    "disappointed_1.ogg"
+  ],
+  "dragon_dead": [
+    "dragon_dead_1.ogg"
+  ],
+  "crack_egg": [
+    "crack_egg_1.ogg",
+    "crack_egg_2.ogg"
+  ]
+}

@@ -1,0 +1,287 @@
+extends Node2D
+## Root scene: owns the Game, wires the views and turns events into sound and effects.
+
+const WORLD_SIZE := Vector2(390, 340)
+
+var game: Game
+var world: Node2D
+var board_view: BoardView
+var hud: Hud
+var book: Monsternomicon
+var win: WinScreen
+var generating: Label
+var _shake_time := 0.0
+var _restarting := false
+
+
+func _ready() -> void:
+	var bg := ColorRect.new()
+	bg.color = UiKit.COL_BG
+	bg.size = WORLD_SIZE
+	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(bg)
+
+	world = Node2D.new()
+	add_child(world)
+	board_view = BoardView.new()
+	world.add_child(board_view)
+	hud = Hud.new()
+	hud.position = Vector2(0, WORLD_SIZE.y - Hud.HEIGHT)
+	world.add_child(hud)
+
+	book = Monsternomicon.new()
+	add_child(book)
+	win = WinScreen.new()
+	add_child(win)
+
+	generating = UiKit.label("building dragon lair...", 16, UiKit.COL_TEXT)
+	UiKit.place(generating, WORLD_SIZE * 0.5, 300, 16)
+	add_child(generating)
+
+	var scan := UiKit.sprite(SpriteDb.ui("scanlines"), Vector2.ZERO, false)
+	add_child(scan)
+
+	board_view.tile_pressed.connect(_on_tile_pressed)
+	board_view.mark_requested.connect(_on_mark_requested)
+	board_view.menu.chosen.connect(_on_mark_chosen)
+	board_view.menu.closed.connect(func() -> void: Audio.play("close_hover"))
+	hud.hero_pressed.connect(_on_hero_pressed)
+	hud.book_pressed.connect(_toggle_book)
+	win.dismissed.connect(_restart)
+
+	new_game()
+	if not OS.get_cmdline_user_args().is_empty() and ResourceLoader.exists("res://tools/dev_harness.gd"):
+		add_child(load("res://tools/dev_harness.gd").new())
+
+
+func new_game(seed_value := 0) -> void:
+	if _restarting:
+		return
+	_restarting = true
+	game = Game.new(seed_value)
+	book.close_book()
+	win.visible = false
+	world.visible = false
+	generating.visible = true
+	await get_tree().process_frame
+	await get_tree().process_frame
+	game.generate()
+	generating.visible = false
+	world.visible = true
+	board_view.input_enabled = true
+	render()
+	Audio.start_music()
+	_restarting = false
+
+
+func render() -> void:
+	board_view.render(game)
+	hud.render(game)
+	if book.visible:
+		book.refresh()
+
+
+func _restart() -> void:
+	Audio.play("restart")
+	new_game()
+
+
+func _on_tile_pressed(p: Vector2i) -> void:
+	if book.visible or not game.is_playing():
+		return
+	var ev := game.press(p)
+	_apply(ev)
+	render()
+
+
+func _on_mark_requested(p: Vector2i) -> void:
+	if book.visible or not game.is_playing():
+		return
+	board_view.menu.open(p, game.board.at_pos(p).mark, board_view.bounds())
+	Audio.play("open_hover")
+
+
+func _on_mark_chosen(p: Vector2i, mark: int) -> void:
+	_apply(game.set_mark(p, mark))
+	render()
+
+
+func _on_hero_pressed() -> void:
+	if book.visible:
+		return
+	if game.status == Game.Status.DEAD:
+		_restart()
+		return
+	var ev := game.hero_pressed()
+	_apply(ev)
+	render()
+	if ev.is_empty() and game.is_playing():
+		hud.play_tapped()
+		Audio.play("jorge")
+
+
+func _toggle_book() -> void:
+	if win.visible:
+		return
+	if book.visible:
+		book.close_book()
+		Audio.play("book_close")
+	else:
+		board_view.cancel_press()
+		book.open_book(game)
+		Settings.mark_nomicon_read()
+		Audio.play("book")
+	board_view.input_enabled = not book.visible
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("restart") and not win.visible:
+		_restart()
+		get_viewport().set_input_as_handled()
+	elif book.visible and event is InputEventMouseButton and event.pressed:
+		book.click(book.to_local(event.position))
+		get_viewport().set_input_as_handled()
+
+
+func _process(delta: float) -> void:
+	if _shake_time > 0.0:
+		_shake_time -= delta
+		world.position = Vector2(randf_range(-2, 2), randf_range(-1, 1))
+		if _shake_time <= 0.0:
+			world.position = Vector2.ZERO
+
+
+func shake(seconds: float) -> void:
+	_shake_time = maxf(_shake_time, seconds)
+
+
+func _apply(events: Array[GameEvent]) -> void:
+	var fx := board_view.fx
+	var reveal_sound := false
+	for e in events:
+		match e.type:
+			GameEvent.Type.REVEALED:
+				if e.flag:
+					Audio.play("uncover")
+				else:
+					reveal_sound = true
+					fx.flash(e.pos, Color(1, 1, 1, 0.6))
+			GameEvent.Type.ATTACKED:
+				_on_attacked(e)
+			GameEvent.Type.COLLECTED:
+				Audio.play("pick_xp")
+				fx.float_text(e.pos, "+%d" % e.amount, UiKit.COL_YELLOW)
+			GameEvent.Type.HEALED:
+				Audio.play("heal")
+				fx.burst(e.pos, Color("ff6b6b"), 10, 16.0)
+			GameEvent.Type.REFUSED:
+				Audio.play("wrong")
+			GameEvent.Type.WALL_HIT:
+				Audio.play("hit_wall")
+				fx.burst(e.pos, Color("8fa0b0"), 5, 10.0)
+				hud.play_stab()
+			GameEvent.Type.WALL_DOWN:
+				Audio.play("wall_down")
+				fx.burst(e.pos, Color("8fa0b0"), 12, 18.0)
+				hud.play_stab()
+			GameEvent.Type.CHEST_OPENED:
+				Audio.play("chest_open")
+				fx.ripple(e.pos, UiKit.COL_GOLD)
+			GameEvent.Type.GNOME_JUMPED:
+				Audio.play("gnome_jump", 0.0)
+				fx.puff(e.pos, SpriteDb.sprite("gnome"), e.target)
+			GameEvent.Type.MINES_DISARMED:
+				if e.amount > 0:
+					Audio.play("earthquake")
+					shake(1.0)
+				else:
+					Audio.play("wrong")
+			GameEvent.Type.MINE_DISARMED_AT:
+				fx.burst(e.pos, Color("ffaa33"), 10, 14.0)
+			GameEvent.Type.SPELL_CAST:
+				if e.kind == Kind.SPELL_DISARM:
+					pass
+				elif e.flag:
+					Audio.play("reveal" if e.kind == Kind.SPELL_ORB else "spell")
+				else:
+					Audio.play("wrong")
+			GameEvent.Type.ORB_USED:
+				Audio.play("reveal" if e.flag else "wrong")
+				fx.ripple(e.pos, Color("8ad8ff"), 0.4)
+			GameEvent.Type.NUMBER_CHANGED:
+				fx.flash(e.pos, Color(1, 1, 0.7, 0.5), 0.35)
+			GameEvent.Type.DRAGON_DEFEATED:
+				shake(0.8)
+				fx.burst(e.pos, Color("ff4a3a"), 16, 26.0, 0.6)
+			GameEvent.Type.MINE_EXPLODED:
+				fx.burst(e.pos, Color("ffaa33"), 14, 22.0, 0.5)
+				fx.flash(e.pos, Color(1, 0.8, 0.3, 0.9), 0.4)
+			GameEvent.Type.LEVEL_UP:
+				Audio.play("level_up")
+				hud.play_level_up()
+			GameEvent.Type.CAN_LEVEL_UP:
+				Audio.play("can_level")
+			GameEvent.Type.ALARM:
+				Audio.play("alarm")
+			GameEvent.Type.HP_CHANGED:
+				hud.animate_hearts(e.amount, e.target.x)
+			GameEvent.Type.XP_CHANGED:
+				hud.animate_gems(e.amount, e.target.x)
+			GameEvent.Type.DIED:
+				Audio.play("lose")
+				shake(0.7)
+				board_view.menu.visible = false
+			GameEvent.Type.WON:
+				_on_won()
+			GameEvent.Type.HERO_TAPPED:
+				hud.play_tapped()
+				Audio.play("jorge", 0.0)
+			GameEvent.Type.MARK_SET:
+				Audio.play("mark" if e.amount > 0 else "remove_mark")
+	if reveal_sound:
+		Audio.play("reveal")
+
+
+func _on_attacked(e: GameEvent) -> void:
+	var fx := board_view.fx
+	if e.flag:
+		hud.play_stab()
+	match e.kind:
+		Kind.DRAGON:
+			Audio.play("dragon_dead")
+		Kind.MINE:
+			Audio.play("explode")
+		Kind.GNOME:
+			Audio.play("disappointed")
+		Kind.DRAGON_EGG:
+			Audio.play("crack_egg")
+		Kind.RAT_KING, Kind.MINE_KING, Kind.WIZARD, Kind.GAZER, Kind.MIMIC, Kind.GIANT:
+			Audio.play("fight_special")
+			fx.burst(e.pos, Color("ffffff"), 10, 16.0)
+		_:
+			Audio.play("fight")
+	if e.amount > 0:
+		fx.flash(e.pos, Color(1, 0.2, 0.2, 0.55), 0.3)
+		fx.float_text(e.pos, "-%d" % e.amount, UiKit.COL_RED)
+
+
+func _on_won() -> void:
+	Audio.play("win")
+	var cleared_before := Settings.has_stamp(Stamps.CLEAR)
+	Settings.add_stamps(game.stamps_this_run)
+	board_view.input_enabled = false
+	win.show_result(game, cleared_before, _max_score())
+
+
+## Every xp on the board at the start, including what chests and walls hold.
+func _max_score() -> int:
+	var total := 0
+	var probe := Game.new(game.seed_value)
+	probe.generate()
+	for t in probe.board.tiles:
+		if t.kind == Kind.MINE:
+			continue
+		total += t.xp
+		if t.contains == Kind.TREASURE:
+			total += t.contains_xp
+	return total
