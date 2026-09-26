@@ -317,14 +317,12 @@ func _on_won() -> void:
 	win.show_result(game, cleared_before, _max_score())
 
 
-## Every xp on the board at the start, including what chests and walls hold.
+## Every xp on the board at the start: monsters, disarmed mines, and what chests and walls hold.
 func _max_score() -> int:
 	var total := 0
 	var probe := Game.new(game.seed_value)
 	probe.generate()
 	for t in probe.board.tiles:
-		if t.kind == Kind.MINE:
-			continue
 		total += t.xp
 		if t.contains == Kind.TREASURE:
 			total += t.contains_xp
