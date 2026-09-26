@@ -86,7 +86,7 @@ func render() -> void:
 	_xray_label.visible = xray
 	if xray:
 		var f := game.clear_forecast()
-		_xray_label.text = "x-ray   damage left %d   hp budget %d   medikits %d   wasted hp %d" % [f.damage_left, f.budget, f.meds_left, f.wasted]
+		_xray_label.text = "x-ray  dmg %d  budget %d  meds %d  wasted %d" % [f.damage_left, f.budget, f.meds_left, f.wasted]
 	hud.render(game)
 	if book.visible:
 		book.refresh()
