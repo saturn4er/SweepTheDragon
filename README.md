@@ -60,7 +60,8 @@ $GODOT --headless --path . --export-release iOS export/ios/Dragonsweeper.xcodepr
   Pages) without cross-origin isolation headers. Serve `export/web/` with any static server.
 - Android needs the Android SDK, a Java 17 runtime and a debug keystore configured in the Godot
   editor settings.
-- iOS produces an Xcode project; open it and set your signing team.
+- iOS needs your Apple Team ID in the preset (`application/app_store_team_id` in
+  `export_presets.cfg`) before the export runs; it produces an Xcode project to sign and build.
 - Mobile locks to landscape. Marks are set with a long press on touch, right click or shift-click
   on desktop.
 
