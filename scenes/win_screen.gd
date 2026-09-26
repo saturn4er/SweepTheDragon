@@ -43,8 +43,8 @@ func _ready() -> void:
 	_hero.scale = Vector2(3, 3)
 	add_child(_hero)
 	for i in 4:
-		var l := UiKit.label("", 16, UiKit.COL_DIM)
-		UiKit.place(l, Vector2(195, 178 + i * 16), 380, 16)
+		var l := UiKit.label("", 12, UiKit.COL_DIM)
+		UiKit.place(l, Vector2(195, 178 + i * 16), 380, 12)
 		add_child(l)
 		_lines.append(l)
 	_score = UiKit.label("", 16, UiKit.COL_TEXT)
@@ -55,8 +55,8 @@ func _ready() -> void:
 	add_child(_time)
 	_stamps = Node2D.new()
 	add_child(_stamps)
-	_hint = UiKit.label("tap to hunt again", 12, UiKit.COL_DIM)
-	UiKit.place(_hint, Vector2(195, 328), 200, 12)
+	_hint = UiKit.label("tap to hunt again", 16, UiKit.COL_DIM)
+	UiKit.place(_hint, Vector2(195, 328), 200, 16)
 	add_child(_hint)
 
 

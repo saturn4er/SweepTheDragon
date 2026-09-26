@@ -6,3 +6,4 @@
 # Godot
 export/
 reports/
+.playwright-mcp/

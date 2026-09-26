@@ -36,9 +36,9 @@ var _book_read := false
 
 func _ready() -> void:
 	add_child(UiKit.sprite(SpriteDb.ui("hud_panel"), Vector2.ZERO, false))
-	var jorge := UiKit.label("Jorge", 16, UiKit.COL_TEXT)
+	var jorge := UiKit.label("Jorge", 12, UiKit.COL_TEXT)
 	jorge.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
-	UiKit.place(jorge, Vector2(26, 21), 48, 16)
+	UiKit.place(jorge, Vector2(26, 21), 48, 12)
 	add_child(jorge)
 	hero_bg = UiKit.sprite(SpriteDb.ui("hero_button_off"), HERO_RECT.position, false)
 	add_child(hero_bg)

@@ -38,15 +38,13 @@ func _ready() -> void:
 	UiKit.place(generating, WORLD_SIZE * 0.5, 300, 16)
 	add_child(generating)
 
-	var scan := UiKit.sprite(SpriteDb.ui("scanlines"), Vector2.ZERO, false)
-	add_child(scan)
-
 	board_view.tile_pressed.connect(_on_tile_pressed)
 	board_view.mark_requested.connect(_on_mark_requested)
 	board_view.menu.chosen.connect(_on_mark_chosen)
 	board_view.menu.closed.connect(func() -> void: Audio.play("close_hover"))
 	hud.hero_pressed.connect(_on_hero_pressed)
 	hud.book_pressed.connect(_toggle_book)
+	book.close_requested.connect(_toggle_book)
 	win.dismissed.connect(_restart)
 
 	new_game()
@@ -141,9 +139,6 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event.is_action_pressed("fullscreen"):
 		var fs := DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_FULLSCREEN
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED if fs else DisplayServer.WINDOW_MODE_FULLSCREEN)
-		get_viewport().set_input_as_handled()
-	elif book.visible and event is InputEventMouseButton and event.pressed:
-		book.click(book.to_local(event.position))
 		get_viewport().set_input_as_handled()
 
 

@@ -3,6 +3,7 @@ extends Node2D
 ## The book overlay: hints, toggles and live monster counts on page 0, stamps and credits on page 1.
 
 signal page_flipped
+signal close_requested
 
 const VERSION := "v0.1.0"
 const PANEL_POS := Vector2(4, 5)
@@ -53,20 +54,20 @@ func _build_page0() -> void:
 
 	var touch := DisplayServer.is_touchscreen_available()
 	var hints := [
-		"* jorge must defeat the dragon",
-		"* it is safe to lose all hearts",
-		"* tap jorge to level up",
-		"* hold a tile to mark it" if touch else "* right click or hold to mark",
-		"* numbers are the sum of",
-		"  nearby monster power",
+		"* slay the dragon",
+		"* dying is safe",
+		"* click jorge to level",
+		"* hold a tile to mark" if touch else "* right click to mark",
+		"* numbers add up the",
+		"  monster levels near",
 	]
 	var y := 50.0
 	for h in hints:
 		var l := UiKit.label(h, 12, UiKit.COL_BOOK_SOFT)
 		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
-		UiKit.place(l, Vector2(_left_center_x() + 4, y), 176, 12)
+		UiKit.place(l, Vector2(_left_center_x() + 2, y), 176, 12)
 		pg.add_child(l)
-		y += 14
+		y += 16
 
 	var note1 := UiKit.label("observe monster", 16, UiKit.COL_BOOK)
 	UiKit.place(note1, Vector2(_left_center_x(), 200), 180, 16)
@@ -75,8 +76,8 @@ func _build_page0() -> void:
 	UiKit.place(note2, Vector2(_left_center_x(), 214), 180, 16)
 	pg.add_child(note2)
 
-	_sound_rect = Rect2(20, 250, 70, 18)
-	_music_rect = Rect2(100, 250, 70, 18)
+	_sound_rect = Rect2(12, 248, 84, 20)
+	_music_rect = Rect2(104, 248, 84, 20)
 	_sound_label = _toggle_label(pg, _sound_rect)
 	_music_label = _toggle_label(pg, _music_rect)
 
@@ -90,14 +91,14 @@ func _build_page0() -> void:
 		var icon := UiKit.sprite(SpriteDb.sprite(name), Vector2(cx, cy))
 		icon.flip_h = SpriteDb.flip_h(name)
 		pg.add_child(icon)
-		var lvl := UiKit.label("", 12, UiKit.COL_ORANGE, 1)
+		var lvl := UiKit.label("", 16, UiKit.COL_ORANGE, 2)
 		lvl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-		UiKit.place(lvl, Vector2(cx - 26, cy), 28, 12)
+		UiKit.place(lvl, Vector2(cx - 27, cy), 30, 16)
 		pg.add_child(lvl)
 		_level_labels[kind] = lvl
-		var cnt := UiKit.label("", 12, UiKit.COL_BOOK)
+		var cnt := UiKit.label("", 16, UiKit.COL_BOOK)
 		cnt.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
-		UiKit.place(cnt, Vector2(cx + 30, cy), 36, 12)
+		UiKit.place(cnt, Vector2(cx + 32, cy), 40, 16)
 		pg.add_child(cnt)
 		_count_labels[kind] = cnt
 		row += 1
@@ -105,9 +106,9 @@ func _build_page0() -> void:
 			row = 0
 			col += 1
 
-	var ver := UiKit.label(VERSION, 12, UiKit.COL_BOOK_SOFT)
-	_version_rect = Rect2(PANEL_SIZE.x * 0.5 + 8, PANEL_SIZE.y - 24, 50, 14)
-	UiKit.place(ver, _version_rect.get_center(), 50, 12)
+	var ver := UiKit.label(VERSION, 16, UiKit.COL_BOOK_SOFT)
+	_version_rect = Rect2(PANEL_SIZE.x * 0.5 + 8, PANEL_SIZE.y - 26, 60, 18)
+	UiKit.place(ver, _version_rect.get_center(), 60, 16)
 	pg.add_child(ver)
 	_platino = UiKit.sprite(SpriteDb.sprite("platino"), _version_rect.get_center() + Vector2(40, 0))
 	_platino.visible = false
@@ -137,42 +138,46 @@ func _build_page1() -> void:
 	pg.add_child(title)
 	var y := 66.0
 	for i in Stamps.ALL.size():
-		var s := UiKit.sprite(SpriteDb.ui("stamp_%d_locked" % i), Vector2(44, y))
+		var s := UiKit.sprite(SpriteDb.ui("stamp_%d_locked" % i), Vector2(32, y))
 		pg.add_child(s)
 		_stamp_sprites.append(s)
 		var desc: Array = Stamps.DESCRIPTIONS[Stamps.ALL[i]]
 		var l1 := UiKit.label(desc[0], 16, UiKit.COL_BOOK)
 		l1.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
-		UiKit.place(l1, Vector2(120, y - 7), 120, 16)
+		UiKit.place(l1, Vector2(120, y - 8), 134, 16)
 		pg.add_child(l1)
 		var l2 := UiKit.label(desc[1], 16, UiKit.COL_BOOK)
 		l2.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
-		UiKit.place(l2, Vector2(120, y + 8), 120, 16)
+		UiKit.place(l2, Vector2(120, y + 8), 134, 16)
 		pg.add_child(l2)
 		y += 46
 
 	var credits := [
 		"a dragonsweeper clone",
 		"",
-		"inspired by dragonsweeper",
-		"by daniel benmergui",
-		"and by mamono sweeper",
+		"inspired by",
+		"dragonsweeper by",
+		"daniel benmergui",
+		"and mamono sweeper",
 		"",
-		"art: kenney tiny dungeon (cc0)",
-		"dawnlike by dragondeplatino",
-		"palette by dawnbringer",
+		"art: kenney (cc0)",
+		"tiny dungeon",
+		"dawnlike by",
+		"dragondeplatino",
+		"palette: dawnbringer",
 		"(cc-by 4.0)",
 		"",
-		"fonts and sounds: kenney (cc0)",
+		"fonts, sounds: kenney",
+		"ambience: opengameart",
 		"",
 		"made with godot",
 	]
-	var cy := 40.0
+	var cy := 34.0
 	for line in credits:
 		var l := UiKit.label(line, 12, UiKit.COL_BOOK_SOFT)
-		UiKit.place(l, Vector2(_right_center_x(), cy), 180, 12)
+		UiKit.place(l, Vector2(_right_center_x(), cy), 186, 12)
 		pg.add_child(l)
-		cy += 13
+		cy += 14
 
 	_flap_prev_rect = Rect2(4, PANEL_SIZE.y - 28, 24, 24)
 	pg.add_child(UiKit.sprite(SpriteDb.ui("flap_prev"), _flap_prev_rect.position, false))
@@ -249,6 +254,14 @@ func click(local: Vector2) -> bool:
 func _unhandled_input(event: InputEvent) -> void:
 	if not visible:
 		return
-	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-		click(to_local(event.position))
+	if event.is_action_pressed("ui_cancel"):
+		close_requested.emit()
+		get_viewport().set_input_as_handled()
+	elif event is InputEventMouseButton and event.pressed:
+		var local := to_local(event.position)
+		if Rect2(Vector2.ZERO, PANEL_SIZE).has_point(local):
+			if event.button_index == MOUSE_BUTTON_LEFT:
+				click(local)
+		else:
+			close_requested.emit()
 		get_viewport().set_input_as_handled()

@@ -42,5 +42,4 @@ Sheets used (`sprites/sheets/dawnlike_*.png`):
 
 ## Music
 
-- **Loopable Dungeon Ambience** (`assets/audio/music/theme.ogg`) from OpenGameArt, CC0.
-  https://opengameart.org/content/loopable-dungeon-ambience
+- `assets/audio/music/theme.ogg` is an original chiptune theme written for this project and rendered by `tools/compose_music.py`.

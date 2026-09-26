@@ -1,18 +1,18 @@
 class_name UiKit
 ## Fonts, colours and small node factories shared by every scene.
 
-const FONT_PATH := "res://assets/fonts/kenney_pixel.ttf"
-const FONT_ALT_PATH := "res://assets/fonts/kenney_mini.ttf"
+const FONT_PATH := "res://assets/fonts/kenney_mini.ttf"
+const FONT_ALT_PATH := "res://assets/fonts/kenney_pixel.ttf"
 
-const COL_TEXT := Color("d9d9d9")
-const COL_DIM := Color("8a8a8a")
+const COL_TEXT := Color("ffffff")
+const COL_DIM := Color("b9bec6")
 const COL_ORANGE := Color("ffb700")
 const COL_YELLOW := Color("f7e26b")
 const COL_GOLD := Color("f7b733")
 const COL_RED := Color("ff0d31")
-const COL_OUTLINE := Color("1a1f26")
-const COL_BOOK := Color("4f2a07")
-const COL_BOOK_SOFT := Color("7a5a35")
+const COL_OUTLINE := Color("0d1014")
+const COL_BOOK := Color("2a1806")
+const COL_BOOK_SOFT := Color("4a2e10")
 const COL_BG := Color("293333")
 
 static var _font: Font
@@ -37,7 +37,6 @@ static func _load_pixel_font(path: String) -> Font:
 		f.antialiasing = TextServer.FONT_ANTIALIASING_NONE
 		f.hinting = TextServer.HINTING_NONE
 		f.subpixel_positioning = TextServer.SUBPIXEL_POSITIONING_DISABLED
-		f.oversampling = 1.0
 		return f
 	return ThemeDB.fallback_font
 

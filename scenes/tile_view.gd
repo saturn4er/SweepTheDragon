@@ -102,6 +102,7 @@ func render(t: Tile, ctx: Dictionary) -> void:
 				var n := board.attack_number(t.pos)
 				if n > 0:
 					number.text = str(n)
+					number.label_settings.font_size = 12 if n >= 100 else 16
 					number.visible = true
 		elif t.is_monster:
 			_render_monster(t, ctx, frame)
