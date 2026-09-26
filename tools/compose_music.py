@@ -61,11 +61,11 @@ class Song:
             self.buffers[name] = array.array("d", [0.0]) * (self.total + 4 * SR)
         return self.buffers[name]
 
-    def play(self, track, start_beat, dur_beats, m, gain, wave_fn, attack=0.004, decay=0.05, sustain=0.75, release=0.03, vibrato=0.0):
+    def play(self, track, start_beat, dur_beats, m, gain, wave_fn, attack=0.004, decay=0.05, sustain=0.75, release=0.03, vibrato=0.0, detune=1.0):
         if m is None:
             return
         buf = self.buf(track)
-        f = freq(m)
+        f = freq(m) * detune
         s0 = int(start_beat * self.beat * SR)
         length = dur_beats * self.beat
         ns = int(length * SR)
@@ -167,8 +167,8 @@ class Song:
         print("wrote", path, round(self.total / SR, 2), "seconds")
 
 
-def dungeon_theme():
-    """Slow, curious exploration theme in D dorian with a cavernous echo."""
+def dungeon_v1():
+    """First draft of the dungeon theme, kept for comparison."""
     random.seed(11)
     song = Song(bpm=84, bars=16)
     melody = [
@@ -220,7 +220,7 @@ def dungeon_theme():
             if k % 2 == 1:
                 song.noise("drums", start + k * 0.5 + 0.07, 0.035, 0.02, 160.0)
     song.echo("arp", 0.5, 0.25, taps=2)
-    song.render(OUT_DIR + "/theme.wav", {})
+    song.render(OUT_DIR + "/theme_v1.wav", {})
 
 
 def battle_theme():
@@ -434,8 +434,125 @@ def clockwork():
     song.render(OUT_DIR + "/clockwork.wav", {})
 
 
+def dungeon_theme(sparse=False, path="/theme.wav"):
+    """Curious dungeon theme in D dorian, 32 bars: A A' B A''.
+
+    A two-bar motif (dotted rise, falling answer) is developed by sequence and variation. The
+    bass holds a D pedal under moving chords, a syncopated 3+3+2 riff replaces arpeggios, and a
+    voice-led counter-line moves in long notes. Pluck timing and velocity are humanised.
+    """
+    random.seed(sparse and 3 or 2)
+    song = Song(bpm=84, bars=32)
+    melody = [
+        # A
+        "D4:.75 E4:.25 F4:1 R:.5 A4:1.5",
+        "G4:.5 F4:.5 E4:1.5 D4:.5 R:1",
+        "D4:.75 E4:.25 F4:.5 G4:.5 B4:1.5 R:.5",
+        "A4:1 G4:.5 F4:.5 E4:2",
+        "F4:.75 G4:.25 A4:1 C5:1 A4:1",
+        "B4:.5 A4:.5 G4:1 E4:.5 F4:.5 G4:1",
+        "E4:2 R:.5 D4:.5 E4:1",
+        "C4:1 D4:2 R:1",
+        # A' (sequence a fifth up, darker turn, leading tone)
+        "A4:.75 B4:.25 C5:1 R:.5 D5:1.5",
+        "C5:.5 B4:.5 A4:1.5 G4:.5 R:1",
+        "F4:.75 G4:.25 A4:.5 B4:.5 D5:1.5 R:.5",
+        "C5:1 B4:.5 A4:.5 G4:2",
+        "E4:.75 F4:.25 G4:1 A#4:1 A4:1",
+        "G4:.5 F4:.5 E4:1 D4:.5 E4:.5 F4:1",
+        "E4:2 R:.5 C#4:.5 E4:1",
+        "D4:3 R:1",
+        # B (lower register, syncopated entries, longer notes)
+        "R:.5 A3:.5 C4:1 F4:1.5 E4:.5",
+        "E4:1 C4:.5 D4:.5 E4:2",
+        "R:.5 G4:.5 B4:1 D5:1 B4:1",
+        "A4:1.5 F4:.5 D4:2",
+        "R:.5 F4:.5 A4:1 C5:1.5 A4:.5",
+        "B4:.5 G4:.5 E4:1 G4:.5 B4:.5 D5:1",
+        "C5:1.5 A4:.5 E4:1 G4:1",
+        "A4:.5 G4:.5 E4:1 C#4:1 R:1",
+        # A'' (return with pickups and a longer close)
+        "D4:.75 E4:.25 F4:1 R:.5 A4:1.5",
+        "G4:.5 F4:.5 E4:1.5 D4:.5 R:1",
+        "D4:.75 E4:.25 F4:.5 G4:.5 B4:1.5 C5:.5",
+        "A4:1 G4:.5 F4:.5 E4:2",
+        "F4:.75 G4:.25 A4:1 C5:1.5 D5:.5",
+        "B4:.5 A4:.5 G4:1 E4:.5 F4:.5 G4:1",
+        "E4:2 D4:.5 C4:.5 E4:1",
+        "D4:3 R:1",
+    ]
+    chord_defs = {
+        "Dm9": (62, [0, 3, 7, 14], 38),
+        "Dm7": (62, [0, 3, 7, 10], 38),
+        "G/D": (67, [0, 4, 7, 12], 38),
+        "Fmaj7": (65, [0, 4, 7, 11], 41),
+        "Em7": (64, [0, 3, 7, 10], 40),
+        "Am7": (69, [0, 3, 7, 10], 45),
+        "Bb": (70, [0, 4, 7, 12], 46),
+        "A7": (69, [0, 4, 7, 10], 45),
+        "C/E": (60, [0, 4, 7, 12], 40),
+        "G": (67, [0, 4, 7, 12], 43),
+    }
+    chords = (
+        ["Dm9", "Dm7", "G/D", "Dm7", "Dm9", "Fmaj7", "Em7", "Am7"]
+        + ["Dm9", "Dm7", "G/D", "Dm7", "Bb", "Fmaj7", "A7", "Dm7"]
+        + ["Fmaj7", "C/E", "G", "Dm7", "Fmaj7", "Em7", "Am7", "A7"]
+        + ["Dm9", "Dm7", "G/D", "Dm7", "Dm9", "Fmaj7", "Em7", "Dm7"]
+    )
+    pedal_bars = {0, 1, 2, 3, 8, 9, 10, 11, 24, 25, 26, 27}
+
+    song.melody("lead", melody, 0.3, triangle, legato=0.9, attack=0.012, decay=0.18, sustain=0.7, release=0.08, vibrato=0.0035)
+    song.melody("lead", melody, 0.12, triangle, legato=0.9, attack=0.02, decay=0.18, sustain=0.7, release=0.08, vibrato=0.0035, detune=1.004)
+    song.echo("lead", 0.75, 0.32)
+
+    pluck = pulse(0.125)
+    prev_counter = 57
+    for b, name in enumerate(chords):
+        root, iv, bass_root = chord_defs[name]
+        start = b * 4.0
+        tones = [root + i for i in iv]
+        colour = tones[3] if len(tones) > 3 else tones[1]
+        low = root - 12
+        riff = [(0.0, low, 1.0), (0.5, tones[2] - 12, 0.55), (1.5, colour - 12, 0.9), (2.5, tones[2] - 12, 0.5), (3.0, tones[1] - 12, 0.85), (3.5, colour - 12, 0.5)]
+        if sparse:
+            riff = [riff[0], riff[2], riff[4]]
+        for offset, note, vel in riff:
+            jitter = random.uniform(-0.02, 0.02)
+            song.play("arp", start + offset + jitter, 0.34, note, 0.075 * vel * random.uniform(0.85, 1.0), pluck, decay=0.05, sustain=0.3, release=0.04)
+        bass_note = 38 if b in pedal_bars else bass_root
+        song.play("bass", start, 1.9, bass_note, 0.26, triangle, attack=0.015, decay=0.25, sustain=0.75, release=0.1)
+        song.play("bass", start + 2.0, 1.4, bass_note, 0.22, triangle, attack=0.015, decay=0.25, sustain=0.75, release=0.1)
+        if not sparse:
+            song.play("bass", start + 3.5, 0.45, bass_note + 7, 0.16, triangle, decay=0.1, sustain=0.7, release=0.06)
+        # voice-led counter line: nearest chord tone in the low-mid register, one per bar
+        candidates = [t for t in [root + i - 12 for i in iv] + [root + i for i in iv] if 50 <= t <= 67 and t != bass_note + 12]
+        counter = min(candidates, key=lambda t: (abs(t - prev_counter), t))
+        prev_counter = counter
+        if not sparse:
+            song.play("counter", start, 3.8, counter, 0.09, triangle, attack=0.25, decay=0.3, sustain=0.85, release=0.3)
+        for offset, g in ((7, 0.03), (12, 0.028)):
+            song.play("pad", start, 4.0, root + offset - 12, g, triangle, attack=0.5, decay=0.1, sustain=1.0, release=0.5)
+        song.kick("drums", start, 0.32, 0.16)
+        if b % 2 == 1:
+            song.kick("drums", start + 2.5, 0.2, 0.12)
+        song.noise("drums", start + 1.0, 0.07, 0.03, 130.0, 900.0)
+        song.noise("drums", start + 3.0, 0.09, 0.03, 130.0, 700.0)
+        if not sparse:
+            for k in (1.5, 3.5):
+                song.noise("drums", start + k + random.uniform(-0.01, 0.01), 0.03, 0.02, 170.0)
+    song.echo("arp", 0.5, 0.2, taps=2)
+    song.lowpass("counter", 1400.0)
+    song.render(OUT_DIR + path, {})
+
+
+def dungeon_sparse():
+    dungeon_theme(sparse=True, path="/theme_sparse.wav")
+
+
 PIECES = {
     "theme": dungeon_theme,
+    "theme_sparse": dungeon_sparse,
+    "theme_v1": dungeon_v1,
     "battle": battle_theme,
     "lydian_wonder": lydian_wonder,
     "waltz": waltz,
