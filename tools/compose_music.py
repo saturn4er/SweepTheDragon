@@ -32,12 +32,24 @@ def triangle(p):
     return 4.0 * abs((p % 1.0) - 0.5) - 1.0
 
 
+def sine(p):
+    return math.sin(2 * math.pi * p)
+
+
+def bell(p):
+    return math.sin(2 * math.pi * p) * 0.7 + math.sin(2 * math.pi * p * 2.76) * 0.2 + math.sin(2 * math.pi * p * 4.07) * 0.1
+
+
+OUT_DIR = "assets/audio/music"
+
+
 class Song:
-    def __init__(self, bpm, bars):
+    def __init__(self, bpm, bars, beats_per_bar=4):
         self.bpm = bpm
         self.beat = 60.0 / bpm
         self.bars = bars
-        self.total = int(bars * 4 * self.beat * SR)
+        self.bpb = beats_per_bar
+        self.total = int(bars * beats_per_bar * self.beat * SR)
         self.buffers = {}
 
     def buf(self, name):
@@ -116,7 +128,7 @@ class Song:
                 dur = float(dur)
                 self.play(track, beat, dur * legato, midi(name), gain, wave_fn, **kw)
                 beat += dur
-        assert abs(beat - self.bars * 4) < 1e-6, beat
+        assert abs(beat - self.bars * self.bpb) < 1e-6, beat
 
     def render(self, path, gains):
         mix = array.array("d", [0.0]) * self.total
@@ -191,7 +203,7 @@ def dungeon_theme():
             if k % 2 == 1:
                 song.noise("drums", start + k * 0.5 + 0.07, 0.035, 0.02, 160.0)
     song.echo("arp", 0.5, 0.25, taps=2)
-    song.render("assets/audio/music/theme.wav", {"lead": 1.0, "arp": 1.0, "bass": 1.0, "pad": 1.0, "drums": 1.0})
+    song.render(OUT_DIR + "/theme.wav", {})
 
 
 def battle_theme():
@@ -243,9 +255,181 @@ def battle_theme():
                 song.noise("drums", t, 0.5, 0.13, 26.0, 190.0)
             if k % 2 == 0:
                 song.noise("drums", t, 0.16 if k % 4 else 0.22, 0.035, 90.0)
-    song.render("assets/audio/music/battle.wav", {})
+    song.render(OUT_DIR + "/battle.wav", {})
 
+
+def lydian_wonder():
+    """F lydian: the raised fourth gives a sense of wonder. Floating lead, plucked arps."""
+    random.seed(21)
+    song = Song(bpm=88, bars=16)
+    melody = [
+        "F4:1 A4:.5 C5:1 B4:.5 A4:1",
+        "G4:.5 B4:.5 D5:1.5 R:.5 B4:1",
+        "A4:1 C5:.5 E5:1 D5:.5 C5:1",
+        "G5:1 E5:.5 C5:1 R:.5 B4:.5 C5:.5",
+        "A4:.5 C5:.5 F5:1 E5:.5 C5:.5 A4:1",
+        "B4:1 D5:.5 G5:1 R:.5 A5:.5 G5:.5",
+        "E5:1.5 C5:.5 A4:1 R:1",
+        "G4:.5 B4:.5 C5:1 R:.5 E5:.5 G5:1",
+        "D5:1 F5:.5 A5:1 G5:.5 F5:1",
+        "B4:.5 D5:.5 G5:1 R:.5 B5:.5 A5:1",
+        "F5:1 E5:.5 C5:1 A4:.5 R:1",
+        "E5:.5 G5:.5 C6:1 B5:.5 G5:.5 E5:1",
+        "D5:1 A4:.5 F4:1 R:.5 A4:.5 D5:.5",
+        "E5:1 B4:.5 G4:1.5 R:1",
+        "B4:.5 D5:.5 G5:1 A5:.5 B5:.5 D6:1",
+        "C6:1 A5:.5 F5:1.5 R:1",
+    ]
+    chords = ["F", "G", "F", "C", "F", "G", "Am", "C", "Dm", "G", "F", "C", "Dm", "Em", "G", "F"]
+    defs = {
+        "F": (65, [0, 4, 7, 12], 41), "G": (67, [0, 4, 7, 12], 43), "C": (60, [0, 4, 7, 12], 48),
+        "Am": (69, [0, 3, 7, 12], 45), "Dm": (62, [0, 3, 7, 12], 38), "Em": (64, [0, 3, 7, 12], 40),
+    }
+    song.melody("lead", melody, 0.32, triangle, legato=0.9, attack=0.012, decay=0.15, sustain=0.7, release=0.08, vibrato=0.004)
+    song.echo("lead", 0.75, 0.36)
+    pluck = pulse(0.125)
+    for b, chord in enumerate(chords):
+        root, iv, bass_root = defs[chord]
+        start = b * 4.0
+        tones = [root + i for i in iv]
+        pattern = [0, 2, 1, 3, 2, 0, 3, 1]
+        for k in range(8):
+            song.play("arp", start + k * 0.5, 0.3, tones[pattern[k]] - 12, 0.07, pluck, decay=0.04, sustain=0.35, release=0.03)
+        song.play("bass", start, 3.9, bass_root, 0.24, triangle, attack=0.02, decay=0.3, sustain=0.75, release=0.12)
+        for offset, g in ((7, 0.04), (12, 0.035), (16, 0.025)):
+            song.play("pad", start, 4.0, root + offset - 12, g, triangle, attack=0.4, decay=0.1, sustain=1.0, release=0.5)
+        song.kick("drums", start, 0.3, 0.15)
+        song.noise("drums", start + 1.0, 0.07, 0.03, 130.0, 1100.0)
+        song.noise("drums", start + 3.0, 0.09, 0.03, 130.0, 900.0)
+        for k in range(8):
+            if k % 2 == 1:
+                song.noise("drums", start + k * 0.5, 0.03, 0.02, 160.0)
+    song.echo("arp", 0.5, 0.22, taps=2)
+    song.render(OUT_DIR + "/lydian_wonder.wav", {})
+
+
+def waltz():
+    """A minor waltz in 3/4: whimsical, tiptoeing through the halls."""
+    random.seed(33)
+    song = Song(bpm=108, bars=24, beats_per_bar=3)
+    melody = [
+        "A4:1 C5:1 E5:1", "D5:1.5 C5:.5 B4:1", "F4:1 A4:1 D5:1", "C5:1.5 A4:.5 F4:1",
+        "E4:1 G4:1 B4:1", "A4:1.5 G4:.5 E4:1", "A4:2 R:1", "R:1 E5:1 A5:1",
+        "F5:1.5 E5:.5 C5:1", "A4:1 C5:1 F5:1", "D5:1.5 B4:.5 G4:1", "B4:1 D5:1 G5:1",
+        "E5:2 C5:1", "A4:1.5 B4:.5 C5:1", "B4:1 G#4:1 E4:1", "R:1 G#4:1 B4:1",
+        "C5:1 E5:1 A5:1", "F5:1.5 D5:.5 A4:1", "B4:1 D5:1 G5:1", "E5:1.5 G5:.5 C5:1",
+        "A4:1 C5:1 F5:1", "D5:1.5 F5:.5 A5:1", "G#5:1 E5:1 B4:1", "B4:1 G#4:1 R:1",
+    ]
+    chords = ["Am", "Am", "Dm", "Dm", "Em", "Em", "Am", "Am", "F", "F", "G", "G", "Am", "Am", "E", "E",
+              "Am", "Dm", "G", "C", "F", "Dm", "E", "E"]
+    defs = {
+        "Am": (69, [0, 3, 7], 45), "Dm": (62, [0, 3, 7], 38), "Em": (64, [0, 3, 7], 40),
+        "F": (65, [0, 4, 7], 41), "G": (67, [0, 4, 7], 43), "E": (64, [0, 4, 7], 40), "C": (60, [0, 4, 7], 48),
+    }
+    song.melody("lead", melody, 0.3, triangle, legato=0.88, attack=0.01, decay=0.12, sustain=0.7, release=0.06, vibrato=0.005)
+    song.echo("lead", 1.0, 0.3, taps=2)
+    stab = pulse(0.125)
+    for b, chord in enumerate(chords):
+        root, iv, bass_root = defs[chord]
+        start = b * 3.0
+        song.play("bass", start, 0.9, bass_root, 0.3, triangle, decay=0.1, sustain=0.7, release=0.08)
+        for beat in (1.0, 2.0):
+            for i in iv:
+                song.play("arp", start + beat, 0.4, root + i - 12, 0.05, stab, decay=0.05, sustain=0.3, release=0.04)
+        song.kick("drums", start, 0.3, 0.14)
+        song.noise("drums", start + 1.0, 0.05, 0.025, 150.0, 1200.0)
+        song.noise("drums", start + 2.0, 0.05, 0.025, 150.0, 1200.0)
+    song.render(OUT_DIR + "/waltz.wav", {})
+
+
+def deep_halls():
+    """Slow pentatonic bells over a drone, long echoes: a vast, quiet place worth exploring."""
+    random.seed(44)
+    song = Song(bpm=72, bars=12)
+    melody = [
+        "A4:2 R:1 C5:1", "E5:2 D5:1 R:1", "G4:1 A4:2 R:1", "R:2 E5:1 G5:1",
+        "D5:2 F5:1 R:1", "A5:2 R:1 G5:1", "E5:1.5 C5:.5 A4:2", "R:2 B4:1 C5:1",
+        "C5:2 A4:1 F4:1", "G4:1 B4:1 D5:2", "E5:2 R:1 A5:1", "G5:1 E5:1 A4:2",
+    ]
+    chords = ["Am", "Am", "Am", "Am", "Dm", "Dm", "Am", "Am", "F", "G", "Am", "Am"]
+    defs = {"Am": (69, 45), "Dm": (62, 38), "F": (65, 41), "G": (67, 43)}
+    song.melody("lead", melody, 0.5, bell, legato=1.0, attack=0.003, decay=1.6, sustain=0.0, release=0.05)
+    song.echo("lead", 0.5, 0.45, taps=4)
+    for b, chord in enumerate(chords):
+        root, bass_root = defs[chord]
+        start = b * 4.0
+        song.play("bass", start, 4.0, bass_root - 12, 0.22, triangle, attack=0.3, decay=0.2, sustain=0.9, release=0.4)
+        song.play("bass", start, 4.0, bass_root + 7 - 12, 0.1, triangle, attack=0.5, decay=0.2, sustain=0.9, release=0.4)
+        for offset, g in ((0, 0.04), (7, 0.035), (12, 0.03)):
+            song.play("pad", start, 4.0, root + offset - 12, g, triangle, attack=0.6, decay=0.1, sustain=1.0, release=0.6)
+        song.kick("drums", start, 0.25, 0.18)
+        song.noise("drums", start + 2.0, 0.06, 0.03, 120.0, 800.0)
+        for k in range(8):
+            song.noise("drums", start + k * 0.5 + 0.25, 0.025, 0.02, 200.0)
+    song.render(OUT_DIR + "/deep_halls.wav", {})
+
+
+def clockwork():
+    """E harmonic minor with a ticking ostinato: tense curiosity, something is turning."""
+    random.seed(55)
+    song = Song(bpm=96, bars=16)
+    melody = [
+        "E5:.5 R:.5 G5:.5 F#5:.5 E5:1 B4:1",
+        "D#5:.5 E5:.5 F#5:1 G5:.5 F#5:.5 E5:1",
+        "A4:.5 C5:.5 E5:1 D5:.5 C5:.5 B4:1",
+        "D#5:1 F#5:.5 A5:.5 B5:1 R:1",
+        "G5:.5 F#5:.5 E5:1 D#5:.5 E5:.5 B4:1",
+        "C5:.5 E5:.5 G5:1 A5:.5 G5:.5 E5:1",
+        "F#5:.5 D#5:.5 B4:1 R:.5 A4:.5 B4:1",
+        "E5:2 R:2",
+        "B4:.5 E5:.5 G5:1 B5:1 G5:1",
+        "A5:.5 F#5:.5 D5:1 E5:.5 F#5:.5 A5:1",
+        "G5:1 E5:.5 C5:1 R:.5 D5:.5 E5:.5",
+        "F#5:1 D#5:.5 B4:1.5 R:1",
+        "E5:.5 G5:.5 B5:1 A5:.5 G5:.5 F#5:1",
+        "E5:.5 C5:.5 A4:1 B4:.5 C5:.5 D5:1",
+        "D#5:1 F#5:1 A5:.5 B5:.5 D#6:1",
+        "E6:1 B5:.5 G5:1 E5:1.5",
+    ]
+    chords = ["Em", "Em", "Am", "B7", "Em", "C", "B7", "Em", "Em", "D", "C", "B7", "Em", "Am", "B7", "Em"]
+    defs = {
+        "Em": (64, [0, 3, 7, 12], 40), "Am": (69, [0, 3, 7, 12], 45), "B7": (59, [0, 4, 7, 10], 47),
+        "C": (60, [0, 4, 7, 12], 48), "D": (62, [0, 4, 7, 12], 38),
+    }
+    song.melody("lead", melody, 0.2, pulse(0.25), legato=0.9, vibrato=0.005)
+    song.echo("lead", 0.75, 0.25, taps=2)
+    tick = pulse(0.125)
+    for b, chord in enumerate(chords):
+        root, iv, bass_root = defs[chord]
+        start = b * 4.0
+        tones = [root + i for i in iv]
+        pattern = [0, 2, 1, 3, 0, 2, 1, 3, 0, 2, 1, 3, 2, 3, 1, 2]
+        for k in range(16):
+            song.play("arp", start + k * 0.25, 0.14, tones[pattern[k]], 0.06, tick, decay=0.02, sustain=0.3, release=0.02)
+        for k, offset in ((0, 0), (1.5, 0), (2.0, 7), (3.0, 12), (3.5, 0)):
+            song.play("bass", start + k, 0.45, bass_root + offset, 0.28, triangle, decay=0.04, sustain=0.8, release=0.03)
+        song.kick("drums", start, 0.6)
+        song.kick("drums", start + 2.0, 0.5)
+        song.noise("drums", start + 1.0, 0.12, 0.05, 90.0, 600.0)
+        song.noise("drums", start + 3.0, 0.14, 0.05, 90.0, 600.0)
+        for k in range(8):
+            song.noise("drums", start + k * 0.5, 0.05 if k % 2 else 0.08, 0.03, 120.0)
+    song.render(OUT_DIR + "/clockwork.wav", {})
+
+
+PIECES = {
+    "theme": dungeon_theme,
+    "battle": battle_theme,
+    "lydian_wonder": lydian_wonder,
+    "waltz": waltz,
+    "deep_halls": deep_halls,
+    "clockwork": clockwork,
+}
 
 if __name__ == "__main__":
-    dungeon_theme()
-    battle_theme()
+    import sys
+    names = sys.argv[2:] or list(PIECES)
+    if len(sys.argv) > 1:
+        OUT_DIR = sys.argv[1]
+    for name in names:
+        PIECES[name]()
