@@ -1,7 +1,8 @@
 class_name Hud
 extends Node2D
 ## Bottom bar: Jorge, hearts, xp gems, the book button and the death message.
-## Lays itself out as one wide row in landscape or two rows in portrait.
+## Lays itself out as one row under the board (landscape), two rows (portrait) or a column beside
+## the board (wide screens such as phones held sideways).
 
 signal hero_pressed
 signal book_pressed
@@ -11,8 +12,11 @@ const HEART_GROUP_GAP := 4
 const GEM_STEP := 8
 
 enum Mood { IDLE, EMPOWERED, LOW, DEAD }
+enum Layout { BOTTOM, PORTRAIT, SIDE }
 
-var portrait := false
+const SIDE_WIDTH := 90.0
+
+var layout_mode := Layout.BOTTOM
 var size := Vector2(390, 41)
 var hero_rect := Rect2(52, 6, 30, 29)
 var book_rect := Rect2(352, 4, 34, 34)
@@ -87,62 +91,95 @@ func _ready() -> void:
 	restart_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	restart_label.visible = false
 	add_child(restart_label)
-	set_portrait(false)
+	set_layout(Layout.BOTTOM)
 
 
 func height() -> float:
 	return size.y
 
 
-func set_portrait(p: bool) -> void:
-	portrait = p
-	if portrait:
-		size = Vector2(300, 74)
-		hero_rect = Rect2(8, 4, 30, 29)
-		book_rect = Rect2(262, 2, 34, 34)
-		hearts_origin = Vector2(12, 46)
-		gems_origin = Vector2(12, 64)
-		UiKit.place(jorge, Vector2(64, 18), 44, 12)
-		death_label.label_settings.font_size = 12
-		restart_label.label_settings.font_size = 12
-		UiKit.place(death_label, Vector2(150, 12), 210, 12)
-		UiKit.place(restart_label, Vector2(150, 26), 210, 12)
-	else:
-		size = Vector2(390, 41)
-		hero_rect = Rect2(52, 6, 30, 29)
-		book_rect = Rect2(352, 4, 34, 34)
-		hearts_origin = Vector2(100, 12)
-		gems_origin = Vector2(100, 30)
-		UiKit.place(jorge, Vector2(26, 21), 52, 12)
-		death_label.label_settings.font_size = 16
-		restart_label.label_settings.font_size = 16
-		UiKit.place(death_label, Vector2(196, 13), 200, 16)
-		UiKit.place(restart_label, Vector2(196, 29), 200, 16)
+func set_layout(mode: Layout) -> void:
+	layout_mode = mode
+	death_label.autowrap_mode = TextServer.AUTOWRAP_OFF
+	death_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	match mode:
+		Layout.PORTRAIT:
+			size = Vector2(300, 74)
+			hero_rect = Rect2(8, 4, 30, 29)
+			book_rect = Rect2(262, 2, 34, 34)
+			hearts_origin = Vector2(12, 46)
+			gems_origin = Vector2(12, 64)
+			UiKit.place(jorge, Vector2(64, 18), 44, 12)
+			death_label.label_settings.font_size = 12
+			restart_label.label_settings.font_size = 12
+			UiKit.place(death_label, Vector2(150, 12), 210, 12)
+			UiKit.place(restart_label, Vector2(150, 26), 210, 12)
+		Layout.SIDE:
+			size = Vector2(SIDE_WIDTH, 300)
+			hero_rect = Rect2(30, 6, 30, 29)
+			book_rect = Rect2(28, 262, 34, 34)
+			hearts_origin = Vector2(20, 64)
+			gems_origin = Vector2(29, 130)
+			UiKit.place(jorge, Vector2(45, 44), 80, 12)
+			death_label.label_settings.font_size = 12
+			restart_label.label_settings.font_size = 12
+			death_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			death_label.vertical_alignment = VERTICAL_ALIGNMENT_TOP
+			UiKit.place(death_label, Vector2(45, 92), 84, 60)
+			UiKit.place(restart_label, Vector2(45, 134), 84, 12)
+		_:
+			size = Vector2(390, 41)
+			hero_rect = Rect2(52, 6, 30, 29)
+			book_rect = Rect2(352, 4, 34, 34)
+			hearts_origin = Vector2(100, 12)
+			gems_origin = Vector2(100, 30)
+			UiKit.place(jorge, Vector2(26, 21), 52, 12)
+			death_label.label_settings.font_size = 16
+			restart_label.label_settings.font_size = 16
+			UiKit.place(death_label, Vector2(196, 13), 200, 16)
+			UiKit.place(restart_label, Vector2(196, 29), 200, 16)
 	panel.size = size
-	panel_line.scale = Vector2(size.x / 4.0, 0.25)
-	panel_shadow.scale = Vector2(size.x / 4.0, 0.25)
+	if mode == Layout.SIDE:
+		panel_line.position = Vector2.ZERO
+		panel_line.scale = Vector2(0.25, size.y / 4.0)
+		panel_shadow.position = Vector2(1, 0)
+		panel_shadow.scale = Vector2(0.25, size.y / 4.0)
+	else:
+		panel_line.position = Vector2.ZERO
+		panel_line.scale = Vector2(size.x / 4.0, 0.25)
+		panel_shadow.position = Vector2(0, 1)
+		panel_shadow.scale = Vector2(size.x / 4.0, 0.25)
 	hero_bg.position = hero_rect.position
 	hero.position = hero_rect.get_center() + Vector2(0, -1)
 	for i in hearts.size():
-		hearts[i].position = hearts_origin + Vector2(_heart_offset(i - 1), 0)
+		hearts[i].position = hearts_origin + _heart_offset(i - 1)
 	_place_gems()
 	book_bg.position = book_rect.get_center()
 	book_icon.position = book_rect.get_center()
 
 
-static func _heart_offset(k: int) -> float:
-	return k * HEART_STEP + HEART_GROUP_GAP * floori(k / 5.0)
+## Heart k (0-based among the drawn hearts): a row grouped by five, or a 5-wide grid on the side.
+func _heart_offset(k: int) -> Vector2:
+	if layout_mode == Layout.SIDE:
+		return Vector2((k % 5) * HEART_STEP, floori(k / 5.0) * 14)
+	return Vector2(k * HEART_STEP + HEART_GROUP_GAP * floori(k / 5.0), 0)
 
 
-static func _gem_offset(i: int, total: int) -> float:
+func _gem_offset(i: int, total: int) -> Vector2:
+	if layout_mode == Layout.SIDE:
+		return Vector2((i % 5) * GEM_STEP, floori(i / 5.0) * 9)
 	var gaps := floori(i / 5.0) if total > 5 else 0
-	return i * GEM_STEP + gaps * GEM_STEP
+	return Vector2(i * GEM_STEP + gaps * GEM_STEP, -3 if i % 2 == 1 else 3)
 
 
 func _place_gems() -> void:
 	for i in gems.size():
-		gems[i].position = gems_origin + Vector2(_gem_offset(i, _gem_total), -3 if i % 2 == 1 else 3)
-	excess.position = gems_origin + Vector2(_gem_offset(_gem_total - 1, _gem_total) + 12, 0)
+		gems[i].position = gems_origin + _gem_offset(i, _gem_total)
+	var last := _gem_offset(_gem_total - 1, _gem_total)
+	if layout_mode == Layout.SIDE:
+		excess.position = gems_origin + Vector2(last.x + 12, last.y)
+	else:
+		excess.position = gems_origin + Vector2(last.x + 12, 0)
 
 
 func render(game: Game) -> void:

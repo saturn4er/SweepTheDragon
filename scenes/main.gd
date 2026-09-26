@@ -3,6 +3,9 @@ extends Node2D
 
 const LANDSCAPE := Vector2(390, 340)
 const PORTRAIT := Vector2(300, 431)
+const WIDE := Vector2(390 + Hud.SIDE_WIDTH, 300)
+## Windows at least this wide relative to their height put the HUD beside the board.
+const WIDE_ASPECT := 1.5
 
 var game: Game
 var world: Node2D
@@ -76,9 +79,16 @@ func _relayout() -> void:
 	var ws := Vector2(get_window().size)
 	if ws.x <= 0 or ws.y <= 0:
 		return
-	portrait = ws.y > ws.x
-	layout_size = PORTRAIT if portrait else LANDSCAPE
 	var aspect := ws.x / ws.y
+	portrait = aspect < 1.0
+	var hud_mode := Hud.Layout.BOTTOM
+	layout_size = LANDSCAPE
+	if portrait:
+		layout_size = PORTRAIT
+		hud_mode = Hud.Layout.PORTRAIT
+	elif aspect >= WIDE_ASPECT:
+		layout_size = WIDE
+		hud_mode = Hud.Layout.SIDE
 	var logical := layout_size
 	if aspect > layout_size.x / layout_size.y:
 		logical.x = layout_size.y * aspect
@@ -90,9 +100,13 @@ func _relayout() -> void:
 	bg.size = logical
 	world.position = offset
 	board_view.set_portrait(portrait)
-	hud.set_portrait(portrait)
-	hud.position = Vector2(0, layout_size.y - hud.height())
+	hud.set_layout(hud_mode)
 	var board_area := Vector2(layout_size.x, layout_size.y - hud.height())
+	if hud_mode == Hud.Layout.SIDE:
+		hud.position = Vector2(layout_size.x - hud.size.x, 0)
+		board_area = Vector2(layout_size.x - hud.size.x, layout_size.y)
+	else:
+		hud.position = Vector2(0, layout_size.y - hud.height())
 	book.layout(offset, board_area)
 	win.layout(Vector2.ZERO, logical)
 	UiKit.place(generating, offset + layout_size * 0.5, 300, 16)
