@@ -1,0 +1,8 @@
+# Godot
+.godot/
+*.import
+export/
+*.translation
+.DS_Store
+# gdUnit4 reports
+reports/
