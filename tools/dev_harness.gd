@@ -66,6 +66,7 @@ func _run() -> void:
 		await get_tree().create_timer(wait).timeout
 	for _i in 6:
 		await get_tree().process_frame
+	print("state hp=%d/%d xp=%d level=%d status=%d" % [main.game.player.hp, main.game.player.max_hp, main.game.player.xp, main.game.player.level, main.game.status])
 	var img := get_viewport().get_texture().get_image()
 	img.save_png(shot)
 	print("saved ", shot, " ", img.get_size())

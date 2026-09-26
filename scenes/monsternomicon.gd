@@ -93,12 +93,12 @@ func _build_page0() -> void:
 		pg.add_child(icon)
 		var lvl := UiKit.label("", 12, UiKit.COL_ORANGE, 2)
 		lvl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-		UiKit.place(lvl, Vector2(cx - 27, cy), 30, 12)
+		UiKit.place(lvl, Vector2(cx - 33, cy), 30, 12)
 		pg.add_child(lvl)
 		_level_labels[kind] = lvl
 		var cnt := UiKit.label("", 12, UiKit.COL_BOOK)
 		cnt.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
-		UiKit.place(cnt, Vector2(cx + 32, cy), 40, 12)
+		UiKit.place(cnt, Vector2(cx + 38, cy), 40, 12)
 		pg.add_child(cnt)
 		_count_labels[kind] = cnt
 		row += 1
