@@ -28,8 +28,7 @@ func _run() -> void:
 		elif a.begins_with("--wait="):
 			wait = float(a.trim_prefix("--wait="))
 		elif a.begins_with("--window="):
-			var wh := a.trim_prefix("--window=").split("x")
-			get_window().size = Vector2i(int(wh[0]), int(wh[1]))
+			steps.append(a.trim_prefix("--"))
 	if shot == "":
 		return
 	while main._restarting:
@@ -46,6 +45,12 @@ func _run() -> void:
 			continue
 		if s.begins_with("key="):
 			await _key(s.get_slice("=", 1))
+			continue
+		if s.begins_with("window="):
+			var wh := s.get_slice("=", 1).split("x")
+			get_window().size = Vector2i(int(wh[0]), int(wh[1]))
+			await get_tree().process_frame
+			await get_tree().process_frame
 			continue
 		match s:
 			"hero":

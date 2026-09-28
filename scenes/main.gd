@@ -25,6 +25,7 @@ var portrait := false
 ## window's aspect so nothing is letterboxed.
 var layout_size := LANDSCAPE
 var offset := Vector2.ZERO
+var _laid_out_for := Vector2i.ZERO
 const UNDO_DEPTH := 300
 var _history: Array[Dictionary] = []
 
@@ -79,6 +80,7 @@ func _relayout() -> void:
 	var ws := Vector2(get_window().size)
 	if ws.x <= 0 or ws.y <= 0:
 		return
+	_laid_out_for = Vector2i(ws)
 	var aspect := ws.x / ws.y
 	portrait = aspect < 1.0
 	var hud_mode := Hud.Layout.BOTTOM
@@ -89,13 +91,13 @@ func _relayout() -> void:
 	elif aspect >= WIDE_ASPECT:
 		layout_size = WIDE
 		hud_mode = Hud.Layout.SIDE
-	var logical := layout_size
-	if aspect > layout_size.x / layout_size.y:
-		logical.x = layout_size.y * aspect
-	else:
-		logical.y = layout_size.x / aspect
-	logical = logical.ceil()
-	get_window().content_scale_size = Vector2i(logical)
+	# The stretch aspect is "expand": the window keeps this base size as a minimum and widens or
+	# heightens the logical area to the window's aspect on its own. Setting the base only on a
+	# layout change avoids a web viewport glitch when it changes on every resize.
+	if get_window().content_scale_size != Vector2i(layout_size):
+		get_window().content_scale_size = Vector2i(layout_size)
+	var scale := minf(ws.x / layout_size.x, ws.y / layout_size.y)
+	var logical := (ws / scale).ceil()
 	offset = ((logical - layout_size) * 0.5).floor()
 	bg.size = logical
 	world.position = offset
@@ -240,6 +242,9 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _process(delta: float) -> void:
+	# The browser build does not always signal growth after a shrink, so the size is polled too.
+	if get_window().size != _laid_out_for:
+		_relayout()
 	if _shake_time > 0.0:
 		_shake_time -= delta
 		world.position = offset + Vector2(randf_range(-2, 2), randf_range(-1, 1))
