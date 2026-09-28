@@ -2,7 +2,7 @@ extends Node2D
 ## Root scene: owns the Game, wires the views and turns events into sound and effects.
 
 const LANDSCAPE := Vector2(390, 340)
-const PORTRAIT := Vector2(300, 431)
+const PORTRAIT := Vector2(300, 390 + 74)
 const WIDE := Vector2(390 + Hud.SIDE_WIDTH, 300)
 ## Windows at least this wide relative to their height put the HUD beside the board.
 const WIDE_ASPECT := 1.5
